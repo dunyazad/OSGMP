@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="File.cpp" />
+    <ClCompile Include="PrimitiveRenderer.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="OSGMP.cpp" />
+    <ClCompile Include="StopWatch.cpp" />
+    <ClCompile Include="PrimitiveRendererVEFM.cpp" />
+    <ClCompile Include="Algorithm\tri_aabb_intersection.cpp">
+      <Filter>Algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="Algorithm\tri_tri_intersection.cpp">
+      <Filter>Algorithm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\OSGCommon.h" />
+    <ClInclude Include="File.h" />
+    <ClInclude Include="PredefinedColor.h" />
+    <ClInclude Include="PrimitiveRenderer.h" />
+    <ClInclude Include="VEFM\Edge.h">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="VEFM\Face.h">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="VEFM\Mesh.h">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="VEFM\VEFM.h">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="VEFM\Vertex.h">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="OSGMP.h" />
+    <ClInclude Include="StopWatch.h" />
+    <ClInclude Include="VEFM\V3.h">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="VEFM\VEFM_Common.h">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="PrimitiveRendererVEFM.h" />
+    <ClInclude Include="VEFM\Octree.h">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="VEFM\VoxelSpace.h">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="Algorithm\tri_aabb_intersection.h">
+      <Filter>Algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="Algorithm\tri_tri_intersection.h">
+      <Filter>Algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="Algorithm\MPE_fastpoly2tri.h">
+      <Filter>Algorithm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="VEFM">
+      <UniqueIdentifier>{7c61ead2-ba7e-4684-a03e-d04b3eb867f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Algorithm">
+      <UniqueIdentifier>{d2604624-fce5-43bb-8e70-f5388ec27eaa}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
