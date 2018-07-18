@@ -79,7 +79,8 @@ public:
 
 					pMesh->PrintInformation();
 
-					pMesh->CollapseEdge(pE);
+					//pMesh->CollapseEdge(pE);
+					pMesh->SplitEdge(pE);
 
 					g_pMP->UpdateModel();
 

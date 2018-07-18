@@ -42,6 +42,8 @@ namespace VEFM
 
 		void CollapseEdge(Edge<T>* pE);
 
+		void SplitEdge(Edge<T>* pE);
+
 		void FlipEdge(Edge<T>* pE);
 		void FlipEdge(Face<T>* pF0, Face<T>* pF1);
 		void FlipEdge(Face<T>* pF0, Face<T>* pF1, Edge<T>* pE);
