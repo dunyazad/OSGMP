@@ -4,9 +4,9 @@
 #include "OSGMP.h"
 using namespace VEFM;
 
-OSGMP<V3>* g_pMP = nullptr;
+OSGMP<Vec3>* g_pMP = nullptr;
 
-PrimitiveRendererVEFM<V3>* pvd = nullptr;
+PrimitiveRendererVEFM<Vec3>* pvd = nullptr;
 string g_pickedObejctName = "";
 ref_ptr<Group> g_pRootNode;
 
@@ -29,59 +29,39 @@ public:
 			case 'q':
 			{
 				printf("Q\n");
-				pvd->SetVisible(false);
-				pvd->SetVisible(true, "LEVEL0");
+
+				pvd->Clear();
+
+				auto pMesh = g_pMP->GetOrCreateMesh("TEMP");
+
+				auto pF0 = pMesh->GetOrCreateFace(Vec3(0, 0, 0), Vec3(10, 0, 0), Vec3(15, 0, 10));
+				auto pF1 = pMesh->GetOrCreateFace(Vec3(0, 0, 0), Vec3(15, 0, 10), Vec3(0, 0, 10));
+
+				g_pMP->UpdateModel();
+
+				pMesh->PrintInformation();
+
 				return true;
 			}
 			case 'w':
+			{
 				printf("W\n");
-				pvd->SetVisible(false);
-				pvd->SetVisible(true, "LEVEL1");
+
+				pvd->Clear();
+
+				auto pMesh = g_pMP->GetOrCreateMesh("TEMP");
+
+				auto pF0 = pMesh->GetFaces()[0];
+				auto pF1 = pMesh->GetFaces()[1];
+
+				pMesh->FaceFlip(pF0, pF1);
+
+				g_pMP->UpdateModel();
+
+				pMesh->PrintInformation();
+
 				return true;
-			case 'e':
-				printf("E\n");
-				pvd->SetVisible(false);
-				pvd->SetVisible(true, "LEVEL2");
-				return true;
-			case 'r':
-				printf("R\n");
-				pvd->SetVisible(false);
-				pvd->SetVisible(true, "LEVEL3");
-				return true;
-			case 't':
-				printf("T\n");
-				pvd->SetVisible(false);
-				pvd->SetVisible(true, "LEVEL4");
-				return true;
-			case 'y':
-				printf("Y\n");
-				pvd->SetVisible(false);
-				pvd->SetVisible(true, "LEVEL5");
-				return true;
-			case 'u':
-				printf("U\n");
-				pvd->SetVisible(false);
-				pvd->SetVisible(true, "LEVEL6");
-				return true;
-			case 'i':
-				printf("Y\n");
-				pvd->SetVisible(false);
-				pvd->SetVisible(true, "LEVEL7");
-				return true;
-			case 'o':
-				printf("O\n");
-				pvd->SetVisible(false);
-				pvd->SetVisible(true, "LEVEL8");
-				return true;
-			case 'p':
-				printf("Y\n");
-				pvd->SetVisible(false);
-				pvd->SetVisible(true, "LEVEL9");
-				return true;
-			case '`':
-				printf("`\n");
-				pvd->ToggleVisible();
-				return true;
+			}
 			case 'f':
 				printf("F\n");
 				{
@@ -112,7 +92,7 @@ public:
 			case 'z':
 				printf("Z\n");
 				{
-					map<tuple<Mesh<V3>*, Face<V3>*>, set<pair<V3, V3>>> result;
+					map<tuple<Mesh<Vec3>*, Face<Vec3>*>, set<pair<Vec3, Vec3>>> result;
 					
 					g_stopWatch.Start();
 					
@@ -125,7 +105,7 @@ public:
 					//{
 					//	for (auto& vv : kvp.second)
 					//	{
-					//		pvd->AddLine(V3toVec3(vv.first), V3toVec3(vv.second), V4_RED, V4_RED);
+					//		pvd->AddLine(vv.first, vv.second, V4_RED, V4_RED);
 					//	}
 					//}
 
@@ -141,7 +121,7 @@ public:
 					names.push_back("T11"); names.push_back("T12"); names.push_back("T13"); names.push_back("T14"); names.push_back("T15"); names.push_back("T16"); names.push_back("T17");
 					names.push_back("T21"); names.push_back("T22"); names.push_back("T23"); names.push_back("T24"); names.push_back("T25"); names.push_back("T26"); names.push_back("T27");
 
-					map<tuple<Mesh<V3>*, Face<V3>*>, set<pair<V3, V3>>> result;
+					map<tuple<Mesh<Vec3>*, Face<Vec3>*>, set<pair<Vec3, Vec3>>> result;
 
 					g_stopWatch.Start();
 
@@ -293,53 +273,53 @@ public:
 			}
 			else
 			{
-				auto pMesh = g_pMP->GetMesh(name);
+				//auto pMesh = g_pMP->GetMesh(name);
 
-				float d0 = (result.getWorldIntersectPoint() - v0).length2();
-				float d1 = (result.getWorldIntersectPoint() - v1).length2();
-				float d2 = (result.getWorldIntersectPoint() - v2).length2();
+				//float d0 = (result.getWorldIntersectPoint() - v0).length2();
+				//float d1 = (result.getWorldIntersectPoint() - v1).length2();
+				//float d2 = (result.getWorldIntersectPoint() - v2).length2();
 
-				//Vec3 p;
-				//if (d0 < d1 && d0 < d2) p = v0;
-				//if (d1 < d0 && d1 < d2) p = v1;
-				//if (d2 < d0 && d2 < d1) p = v2;
+				////Vec3 p;
+				////if (d0 < d1 && d0 < d2) p = v0;
+				////if (d1 < d0 && d1 < d2) p = v1;
+				////if (d2 < d0 && d2 < d1) p = v2;
 
-				//auto pV = pMesh->GetVertex(Vec3toV3(p));
-				//if (pV)
+				////auto pV = pMesh->GetVertex(Vec3toV3(p));
+				////if (pV)
+				////{
+				////	//pV->QueryDelete();
+				////	//g_pMP->UpdateModel(name);
+
+				////	set<Face*> faces;
+				////	auto& ies = pV->GetIncidentEdges();
+				////	for (auto& pE : ies)
+				////	{
+				////		auto& ifs = pE->GetInsidentFaces();
+				////		for (auto& pF : ifs)
+				////		{
+				////			faces.insert(pF);
+				////		}
+				////	}
+
+				////	for (auto& pF : faces)
+				////	{
+				////		//pvd->AddTriangleByFace(pF, V4_RED, false);
+				////		pF->QueryDelete();
+				////	}
+
+				////	g_pMP->UpdateModel(name);
+				////}
+
+				//auto pFace = pMesh->GetFace(v0, v1, v2);
+				//if (pFace)
 				//{
-				//	//pV->QueryDelete();
-				//	//g_pMP->UpdateModel(name);
+				//	//pvd->AddTriangleByFace(pFace, V4_RED, false);
 
-				//	set<Face*> faces;
-				//	auto& ies = pV->GetIncidentEdges();
-				//	for (auto& pE : ies)
-				//	{
-				//		auto& ifs = pE->GetInsidentFaces();
-				//		for (auto& pF : ifs)
-				//		{
-				//			faces.insert(pF);
-				//		}
-				//	}
-
-				//	for (auto& pF : faces)
-				//	{
-				//		//pvd->AddTriangleByFace(pF, V4_RED, false);
-				//		pF->QueryDelete();
-				//	}
-
+				//	pFace->QueryDelete();
 				//	g_pMP->UpdateModel(name);
 				//}
 
-				auto pFace = pMesh->GetFace(Vec3toV3(v0), Vec3toV3(v1), Vec3toV3(v2));
-				if (pFace)
-				{
-					//pvd->AddTriangleByFace(pFace, V4_RED, false);
-
-					pFace->QueryDelete();
-					g_pMP->UpdateModel(name);
-				}
-
-				//////pvd->AddTriangle(v0, v1, v2, V4_GREEN, false);
+				////////pvd->AddTriangle(v0, v1, v2, V4_GREEN, false);
 			}
 		}
 	}
@@ -374,7 +354,7 @@ public:
 	}
 };
 
-void DrawNode(const OctreeNode<Vertex<V3>>* pNode)
+void DrawNode(const OctreeNode<Vertex<Vec3>, Vec3>* pNode)
 {
 	if (pNode->ChildExists())
 	{
@@ -383,48 +363,47 @@ void DrawNode(const OctreeNode<Vertex<V3>>* pNode)
 
 		if (pNode->GetLevel() == 0)
 		{
-			pvd->AddBoxByV3(pNode->GetCenter(), max.x - min.x, max.y - min.y, max.z - min.z, Vec4(1, 1, 1, 1), true, "LEVEL0");
+			pvd->AddBox(pNode->GetCenter(), max.x() - min.x(), max.y() - min.y(), max.z() - min.z(), Vec4(1, 1, 1, 1), true, "LEVEL0");
 		}
 		else if (pNode->GetLevel() == 1)
 		{
-			pvd->AddBoxByV3(pNode->GetCenter(), max.x - min.x, max.y - min.y, max.z - min.z, Vec4(0, 1, 1, 1), true, "LEVEL1");
+			pvd->AddBox(pNode->GetCenter(), max.x() - min.x(), max.y() - min.y(), max.z() - min.z(), Vec4(0, 1, 1, 1), true, "LEVEL1");
 		}
 		else if (pNode->GetLevel() == 2)
 		{
-			pvd->AddBoxByV3(pNode->GetCenter(), max.x - min.x, max.y - min.y, max.z - min.z, Vec4(1, 0, 1, 1), true, "LEVEL2");
+			pvd->AddBox(pNode->GetCenter(), max.x() - min.x(), max.y() - min.y(), max.z() - min.z(), Vec4(1, 0, 1, 1), true, "LEVEL2");
 		}
 		else if (pNode->GetLevel() == 3)
 		{
-			pvd->AddBoxByV3(pNode->GetCenter(), max.x - min.x, max.y - min.y, max.z - min.z, Vec4(1, 1, 0, 1), true, "LEVEL3");
+			pvd->AddBox(pNode->GetCenter(), max.x() - min.x(), max.y() - min.y(), max.z() - min.z(), Vec4(1, 1, 0, 1), true, "LEVEL3");
 		}
 		else if (pNode->GetLevel() == 4)
 		{
-			pvd->AddBoxByV3(pNode->GetCenter(), max.x - min.x, max.y - min.y, max.z - min.z, Vec4(1, 0, 0, 1), true, "LEVEL4");
+			pvd->AddBox(pNode->GetCenter(), max.x() - min.x(), max.y() - min.y(), max.z() - min.z(), Vec4(1, 0, 0, 1), true, "LEVEL4");
 		}
 		else if (pNode->GetLevel() == 5)
 		{
-			pvd->AddBoxByV3(pNode->GetCenter(), max.x - min.x, max.y - min.y, max.z - min.z, Vec4(0, 1, 0, 1), true, "LEVEL5");
+			pvd->AddBox(pNode->GetCenter(), max.x() - min.x(), max.y() - min.y(), max.z() - min.z(), Vec4(0, 1, 0, 1), true, "LEVEL5");
 		}
 		else if (pNode->GetLevel() == 6)
 		{
-			pvd->AddBoxByV3(pNode->GetCenter(), max.x - min.x, max.y - min.y, max.z - min.z, Vec4(0, 0, 1, 1), true, "LEVEL6");
+			pvd->AddBox(pNode->GetCenter(), max.x() - min.x(), max.y() - min.y(), max.z() - min.z(), Vec4(0, 0, 1, 1), true, "LEVEL6");
 		}
 		else if (pNode->GetLevel() == 7)
 		{
-			pvd->AddBoxByV3(pNode->GetCenter(), max.x - min.x, max.y - min.y, max.z - min.z, Vec4(0.5f, 1, 1, 1), true, "LEVEL7");
+			pvd->AddBox(pNode->GetCenter(), max.x() - min.x(), max.y() - min.y(), max.z() - min.z(), Vec4(0.5f, 1, 1, 1), true, "LEVEL7");
 		}
 		else if (pNode->GetLevel() == 8)
 		{
-			pvd->AddBoxByV3(pNode->GetCenter(), max.x - min.x, max.y - min.y, max.z - min.z, Vec4(0.5f, 0.5f, 1, 1), true, "LEVEL8");
+			pvd->AddBox(pNode->GetCenter(), max.x() - min.x(), max.y() - min.y(), max.z() - min.z(), Vec4(0.5f, 0.5f, 1, 1), true, "LEVEL8");
 		}
 		else if (pNode->GetLevel() == 9)
 		{
-			pvd->AddBoxByV3(pNode->GetCenter(), max.x - min.x, max.y - min.y, max.z - min.z, Vec4(0.5f, 0.5f, 0.5f, 1), true, "LEVEL9");
+			pvd->AddBox(pNode->GetCenter(), max.x() - min.x(), max.y() - min.y(), max.z() - min.z(), Vec4(0.5f, 0.5f, 0.5f, 1), true, "LEVEL9");
 		}
 
-
 		auto children = pNode->GetChildren();
-		for (int i = 0; i < OctreeNode<Vertex<V3>>::INDEX_SIZE; i++)
+		for (int i = 0; i < OctreeNodeIndex::INDEX_SIZE; i++)
 		{
 			if (children[i] != nullptr)
 			{
@@ -434,11 +413,58 @@ void DrawNode(const OctreeNode<Vertex<V3>>* pNode)
 	}
 }
 
-void DrawVolumeInfo(const Octree<Vertex<V3>>* pVolumeInfo)
+void DrawVolumeInfo(const Octree<Vertex<Vec3>, Vec3>* pVolumeInfo)
 {
 	auto pRootNode = pVolumeInfo->GetRootNode();
 	DrawNode(pRootNode);
 }
+//
+//void Triangluate(const Vec3& fv0, const Vec3& fv1, const Vec3& fv2, const vector<Vec3>& points, vector<tuple<Vec3, Vec3, Vec3>>& result)
+//{
+//	auto d01 = fv1 - fv0;
+//	auto d02 = fv2 - fv0;
+//	auto normal = d02 ^ d01;
+//	normal.normalize();
+//	auto center = (fv0 + fv1 + fv2) / 3;
+//
+//	Matrix m;
+//	m.makeRotate(Vec3(0, 0, 1), normal);
+//	m.translate(center);
+//
+//	auto im = Matrix::inverse(m);
+//
+//	ref_ptr<Vec3Array> pVertices = new Vec3Array;
+//
+//	auto pfv0 = im * fv0;
+//	pVertices->push_back(Vec3(pfv0.x(), pfv0.y(), 0));
+//	auto pfv1 = im * fv1;
+//	pVertices->push_back(Vec3(pfv1.x(), pfv1.y(), 0));
+//	auto pfv2 = im * fv2;
+//	pVertices->push_back(Vec3(pfv2.x(), pfv2.y(), 0));
+//
+//	for (auto& p : points)
+//	{
+//		auto pp = im * p;
+//		pVertices->push_back(Vec3(pp.x(), pp.y(), 0));
+//	}
+//
+//	ref_ptr<osgUtil::DelaunayTriangulator> pDT = new osgUtil::DelaunayTriangulator;
+//	pDT->setInputPointArray(pVertices);
+//	pDT->triangulate();
+//
+//	auto pTriangles = pDT->getTriangles();
+//	for (unsigned int i = 0; i < pTriangles->size() / 3; i++)
+//	{
+//		auto i0 = pTriangles->at(i * 3 + 0);
+//		auto i1 = pTriangles->at(i * 3 + 1);
+//		auto i2 = pTriangles->at(i * 3 + 2);
+//		auto& v0 = pVertices->at(i0);
+//		auto& v1 = pVertices->at(i1);
+//		auto& v2 = pVertices->at(i2);
+//
+//		result.push_back(make_tuple(m * v0, m * v1, m * v2));
+//	}
+//}
 
 int main(int argc, char** argv)
 {
@@ -457,19 +483,69 @@ int main(int argc, char** argv)
 	osgUtil::Optimizer optimzer;
 	optimzer.optimize(g_pRootNode);
 
-	PrimitiveRendererVEFM<V3> vd(g_pRootNode);
+	PrimitiveRendererVEFM<Vec3> vd(g_pRootNode);
 	pvd = &vd;
 
 	// add a viewport to the viewer and attach the scene graph.
 	viewer.setSceneData(g_pRootNode);
 
 
-	OSGMP<V3> mp(g_pRootNode);
+	OSGMP<Vec3> mp(g_pRootNode);
 	g_pMP = &mp;
 	g_pMP->SetVD(pvd);
 
-	//mp.LoadABDFile("Mx", "../../res/MxBone.abd");
-	//mp.LoadABDFile("MxTeeth", "../../res/MxTeeth.abd");
+	/*mp.LoadABDFile("Mx", "../../res/MxBone.abd");
+	mp.LoadABDFile("MxTeeth", "../../res/MxTeeth.abd");*/
+
+	//Vec3 fv0(0, 0, -400);
+	//Vec3 fv1(250, 0, 0);
+	//Vec3 fv2(500, 0, -400);
+	//pvd->AddTriangle(fv0, fv1, fv2, Vec4(GREEN, 0.3), true);
+
+	//vector<Vec3> vertices;
+	//vertices.push_back(Vec3(110, 0, -260));
+	//vertices.push_back(Vec3(120, 0, -330));
+	//vertices.push_back(Vec3(190, 0, -120));
+	//vertices.push_back(Vec3(230, 0, -180));
+	//vertices.push_back(Vec3(170, 0, -230));
+	//vertices.push_back(Vec3(200, 0, -250));
+	//vertices.push_back(Vec3(150, 0, -310));
+	//vertices.push_back(Vec3(230, 0, -300));
+	//vertices.push_back(Vec3(230, 0, -210));
+	//vertices.push_back(Vec3(270, 0, -190));
+	//vertices.push_back(Vec3(240, 0, -130));
+	//vertices.push_back(Vec3(230, 0, -70));
+	//vertices.push_back(Vec3(280, 0, -100));
+	//vertices.push_back(Vec3(310, 0, -210));
+	//vertices.push_back(Vec3(240, 0, -250));
+	//vertices.push_back(Vec3(270, 0, -270));
+	//vertices.push_back(Vec3(290, 0, -230));
+	//vertices.push_back(Vec3(330, 0, -240));
+	//vertices.push_back(Vec3(340, 0, -270));
+	//vertices.push_back(Vec3(320, 0, -320));
+	//vertices.push_back(Vec3(130, 0, -360));
+	//vertices.push_back(Vec3(390, 0, -380));
+	//vertices.push_back(Vec3(270, 0, -350));
+	//vertices.push_back(Vec3(380, 0, -330));
+	//vertices.push_back(Vec3(360, 0, -220));
+
+	//for (unsigned int i = 0; i < vertices.size(); i++)
+	//{
+	//	pvd->AddBox(vertices[i], 1, 1, 1, V4_WHITE, true);
+	//}
+
+	//for (unsigned int i = 0; i < vertices.size() - 1; i++)
+	//{
+	//	pvd->AddLine(vertices[i], vertices[i + 1], Vec4(WHITE, 0.1), Vec4(WHITE, 0.1));
+	//}
+
+	//vector<tuple<Vec3, Vec3, Vec3>> result;
+	//Triangluate(fv0, fv1, fv2, vertices, result);
+
+	//for (auto& r : result)
+	//{
+	//	pvd->AddTriangle(get<0>(r), get<1>(r), get<2>(r), V4_RED, false);
+	//}
 
 	return viewer.run();
 }

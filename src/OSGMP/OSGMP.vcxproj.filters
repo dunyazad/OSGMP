@@ -4,9 +4,7 @@
     <ClCompile Include="File.cpp" />
     <ClCompile Include="PrimitiveRenderer.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="OSGMP.cpp" />
     <ClCompile Include="StopWatch.cpp" />
-    <ClCompile Include="PrimitiveRendererVEFM.cpp" />
     <ClCompile Include="Algorithm\tri_aabb_intersection.cpp">
       <Filter>Algorithm</Filter>
     </ClCompile>
@@ -57,6 +55,25 @@
     </ClInclude>
     <ClInclude Include="Algorithm\MPE_fastpoly2tri.h">
       <Filter>Algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="OSGMP.hpp" />
+    <ClInclude Include="VEFM\Edge.hpp">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="VEFM\Face.hpp">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="VEFM\Mesh.hpp">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="VEFM\Octree.hpp">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="VEFM\Vertex.hpp">
+      <Filter>VEFM</Filter>
+    </ClInclude>
+    <ClInclude Include="VEFM\VoxelSpace.hpp">
+      <Filter>VEFM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

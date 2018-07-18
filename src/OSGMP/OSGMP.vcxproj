@@ -85,10 +85,8 @@
     <ClCompile Include="Algorithm\tri_aabb_intersection.cpp" />
     <ClCompile Include="Algorithm\tri_tri_intersection.cpp" />
     <ClCompile Include="File.cpp" />
-    <ClCompile Include="OSGMP.cpp" />
     <ClCompile Include="PrimitiveRenderer.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PrimitiveRendererVEFM.cpp" />
     <ClCompile Include="StopWatch.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -98,19 +96,26 @@
     <ClInclude Include="Algorithm\tri_tri_intersection.h" />
     <ClInclude Include="File.h" />
     <ClInclude Include="OSGMP.h" />
+    <ClInclude Include="OSGMP.hpp" />
     <ClInclude Include="PredefinedColor.h" />
     <ClInclude Include="PrimitiveRenderer.h" />
     <ClInclude Include="PrimitiveRendererVEFM.h" />
     <ClInclude Include="StopWatch.h" />
     <ClInclude Include="VEFM\Edge.h" />
+    <ClInclude Include="VEFM\Edge.hpp" />
     <ClInclude Include="VEFM\Face.h" />
+    <ClInclude Include="VEFM\Face.hpp" />
     <ClInclude Include="VEFM\Mesh.h" />
+    <ClInclude Include="VEFM\Mesh.hpp" />
     <ClInclude Include="VEFM\Octree.h" />
+    <ClInclude Include="VEFM\Octree.hpp" />
+    <ClInclude Include="VEFM\Vertex.hpp" />
     <ClInclude Include="VEFM\VoxelSpace.h" />
     <ClInclude Include="VEFM\V3.h" />
     <ClInclude Include="VEFM\VEFM.h" />
     <ClInclude Include="VEFM\VEFM_Common.h" />
     <ClInclude Include="VEFM\Vertex.h" />
+    <ClInclude Include="VEFM\VoxelSpace.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
