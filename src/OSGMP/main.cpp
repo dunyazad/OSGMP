@@ -193,8 +193,10 @@ public:
 				{
 					g_pMP->UpdateModel();
 
-					g_pMP->SaveSTLFile("Mx", "../../res/R1.stl", true);
-					g_pMP->SaveSTLFile("MxTeeth", "../../res/R2.stl", true);
+					//g_pMP->SaveSTLFile("Mx", "../../res/R1.stl", true);
+					//g_pMP->SaveSTLFile("MxTeeth", "../../res/R2.stl", true);
+
+					g_pMP->SaveSTLFile("TEMP", "../../res/TEMP.stl", true);
 				}
 				return false;
 			case 'a':

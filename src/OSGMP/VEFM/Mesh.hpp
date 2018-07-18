@@ -473,44 +473,47 @@ namespace VEFM
 		if (pE == nullptr)
 			return;
 
-		//auto& faces = pE->GetInsidentFaces();
+		auto& faces = pE->GetInsidentFaces();
 
-		//auto& vs = pE->GetVertices();
-		//auto& vsi = vs.begin();
-		//auto pV0 = *vsi;
-		//vsi++;
-		//auto pV1 = *vsi;
+		auto& vs = pE->GetVertices();
+		auto& vsi = vs.begin();
+		auto pV0 = *vsi;
+		vsi++;
+		auto pV1 = *vsi;
 
-		////pvd->AddLine(pV0->P(), pV1->P(), V4_RED, V4_RED);
+		auto pVN = GetOrCreateVertex((pV0->P() + pV1->P()) * 0.5f);
 
-		//auto pVN = GetOrCreateVertex((pV0->P() + pV1->P()) * 0.5f);
-		//set<tuple<T, T, T>> toCreate;
-		//set<Face<T>*> toDelete;
-		//for (auto& pF : faces)
-		//{
-		//	if (pV0 == pF->V0() && pV1 == pF->V1())
-		//	{
-		//		toCreate.insert(make_tuple(pV0->P(), pVN->P(), pV2->()));
-		//	}
-		//	else if (pV0 == pF->V1() && pV1 == pF->V2())
-		//	{
-		//		toCreate.insert(make_tuple(pV0->P(), pVN->P(), pV2->()));
-		//	}
+		set<Face<T>*> toDelete;
+		set<tuple<T, T, T>> toCreate;
+		for (auto& pF : faces)
+		{
+			toDelete.insert(pF);
 
-		//	toDelete.insert(pF);
-		//}
-		//for (auto& pF : toDelete)
-		//{
-		//	pF->QueryDelete();
-		//}
-		//for (auto& vvv : toCreate)
-		//{
-		//	GetOrCreateFace(get<0>(vvv), get<1>(vvv), get<2>(vvv));
+			if (pF->V0() != pV0 && pF->V0() != pV1)
+			{
+				toCreate.insert(make_tuple(pF->V0()->P(), pF->V1()->P(), pVN->P()));
+				toCreate.insert(make_tuple(pVN->P(), pF->V2()->P(), pF->V0()->P()));
+			}
+			else if (pF->V1() != pV0 && pF->V1() != pV1)
+			{
+				toCreate.insert(make_tuple(pF->V1()->P(), pF->V2()->P(), pVN->P()));
+				toCreate.insert(make_tuple(pVN->P(), pF->V0()->P(), pF->V1()->P()));
+			}
+			else if (pF->V2() != pV0 && pF->V2() != pV1)
+			{
+				toCreate.insert(make_tuple(pF->V2()->P(), pF->V0()->P(), pVN->P()));
+				toCreate.insert(make_tuple(pVN->P(), pF->V1()->P(), pF->V2()->P()));
+			}
+		}
 
-		//	printf("%f %f %f\n", get<0>(vvv).x(), get<0>(vvv).y(), get<0>(vvv).z());
-		//	printf("%f %f %f\n", get<1>(vvv).x(), get<1>(vvv).y(), get<1>(vvv).z());
-		//	printf("%f %f %f\n", get<2>(vvv).x(), get<2>(vvv).y(), get<2>(vvv).z());
-		//}
+		for (auto& pF : toDelete)
+		{
+			pF->QueryDelete();
+		}
+		for (auto& vvv : toCreate)
+		{
+			GetOrCreateFace(get<0>(vvv), get<1>(vvv), get<2>(vvv));
+		}
 	}
 
 	template<typename T>
