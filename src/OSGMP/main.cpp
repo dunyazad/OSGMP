@@ -34,8 +34,17 @@ public:
 
 				auto pMesh = g_pMP->GetOrCreateMesh("TEMP");
 
-				auto pF0 = pMesh->GetOrCreateFace(Vec3(0, 0, 0), Vec3(10, 0, 0), Vec3(15, 0, 10));
-				auto pF1 = pMesh->GetOrCreateFace(Vec3(0, 0, 0), Vec3(15, 0, 10), Vec3(0, 0, 10));
+				pMesh->GetOrCreateFace(Vec3(0, 0, 0), Vec3(10, 0, 0), Vec3(5, 0, 5));
+				pMesh->GetOrCreateFace(Vec3(10, 0, 0), Vec3(15, 0, 5), Vec3(5, 0, 5));
+				pMesh->GetOrCreateFace(Vec3(10, 0, 0), Vec3(20, 0, 0), Vec3(15, 0, 5));
+				pMesh->GetOrCreateFace(Vec3(20, 0, 0), Vec3(25, 0, 5), Vec3(15, 0, 5));
+				pMesh->GetOrCreateFace(Vec3(20, 0, 0), Vec3(30, 0, 0), Vec3(25, 0, 5));
+
+				pMesh->GetOrCreateFace(Vec3(0, 0, 0), Vec3(5, 0, -5), Vec3(10, 0, 0));
+				pMesh->GetOrCreateFace(Vec3(10, 0, 0), Vec3(5, 0, -5), Vec3(15, 0, -5));
+				pMesh->GetOrCreateFace(Vec3(10, 0, 0), Vec3(15, 0, -5), Vec3(20, 0, 0));
+				pMesh->GetOrCreateFace(Vec3(20, 0, 0), Vec3(15, 0, -5), Vec3(25, 0, -5));
+				pMesh->GetOrCreateFace(Vec3(20, 0, 0), Vec3(25, 0, -5), Vec3(30, 0, 0));
 
 				g_pMP->UpdateModel();
 
@@ -54,7 +63,7 @@ public:
 				auto pF0 = pMesh->GetFaces()[0];
 				auto pF1 = pMesh->GetFaces()[1];
 
-				pMesh->FaceFlip(pF0, pF1);
+				pMesh->FlipEdge(pF0, pF1);
 
 				g_pMP->UpdateModel();
 
@@ -62,6 +71,21 @@ public:
 
 				return true;
 			}
+			case 'l':
+				printf("L\n");
+				{
+					auto pMesh = g_pMP->GetMesh("TEMP");
+					auto pE = pMesh->GetEdge(Vec3(10, 0, 0), Vec3(20, 0, 0));
+
+					pMesh->PrintInformation();
+
+					pMesh->CollapseEdge(pE);
+
+					g_pMP->UpdateModel();
+
+					pMesh->PrintInformation();
+				}
+				return true;
 			case 'f':
 				printf("F\n");
 				{

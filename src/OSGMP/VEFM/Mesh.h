@@ -40,8 +40,12 @@ namespace VEFM
 
 		void Refresh();
 
-		void FaceFlip(Face<T>* pF0, Face<T>* pF1);
-		
+		void CollapseEdge(Edge<T>* pE);
+
+		void FlipEdge(Edge<T>* pE);
+		void FlipEdge(Face<T>* pF0, Face<T>* pF1);
+		void FlipEdge(Face<T>* pF0, Face<T>* pF1, Edge<T>* pE);
+
 		Edge<T>* FindFirstMetBorderEdge();
 		vector<Edge<T>*> FindBorderEdges();
 		vector<Edge<T>*> FindNonManifoldEdges();

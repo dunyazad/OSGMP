@@ -409,55 +409,141 @@ namespace VEFM
 	}
 
 	template<typename T>
-	void Mesh<T>::FaceFlip(Face<T>* pF0, Face<T>* pF1)
+	void Mesh<T>::CollapseEdge(Edge<T>* pE)
 	{
-		auto pE = pF0->GetCommonEdge(pF1);
-		if (pE != nullptr)
+		if (pE == nullptr)
+			return;
+		
+		set<Edge<T>*> edges;
+
+		auto& vs = pE->GetVertices();
+		auto& vsi = vs.begin();
+		auto pV0 = *vsi;
+		vsi++;
+		auto pV1 = *vsi;
+
+		pV0->QueryDelete();
+		pV1->QueryDelete();
+
+		for (auto& pE : pV0->GetIncidentEdges())
 		{
-			pF0->QueryDelete();
-			pF1->QueryDelete();
+			edges.insert(pE);
+		}
+		for (auto& pE : pV1->GetIncidentEdges())
+		{
+			edges.insert(pE);
+		}
 
-			Vertex<T>* pCV0 = nullptr;
-			Vertex<T>* pCV1 = nullptr;
-			Vertex<T>* pNV0 = nullptr;
-			Vertex<T>* pNV1 = nullptr;
-
-			auto& cvs = pE->GetVertices();
-			auto& cvsi = cvs.begin();
-			pCV0 = *cvsi;
-			cvsi++;
-			pCV1 = *cvsi;
-
-			if (pF0->V0() != pCV0 && pF0->V0() != pCV1) pNV0 = pF0->V0();
-			else if (pF0->V1() != pCV0 && pF0->V1() != pCV1) pNV0 = pF0->V1();
-			else if (pF0->V2() != pCV0 && pF0->V2() != pCV1) pNV0 = pF0->V2();
-			else return;
-
-			if (pF1->V0() != pCV0 && pF1->V0() != pCV1) pNV1 = pF1->V0();
-			else if (pF1->V1() != pCV0 && pF1->V1() != pCV1) pNV1 = pF1->V1();
-			else if (pF1->V2() != pCV0 && pF1->V2() != pCV1) pNV1 = pF1->V2();
-			else return;
-
-			auto& pc0 = pCV0->P();
-			auto& pc1 = pCV1->P();
-			auto& pn0 = pNV0->P();
-			auto& pn1 = pNV1->P();
-
-			auto d00 = pn0 - pc0;
-			auto d01 = pn1 - pc0;
-			auto normal = d01 ^ d00; 
-			normal.normalize();
-
-			if (pF0->GetFaceNormal() * normal < 0)
+		set<Face<T>*> faces;
+		for (auto& pE : edges)
+		{
+			for (auto& pF : pE->GetInsidentFaces())
 			{
-				GetOrCreateFace(pn1, pc0, pn0);
-				GetOrCreateFace(pc1, pn1, pn0);
+				faces.insert(pF);
 			}
-			else
+		}
+
+		auto pVN = GetOrCreateVertex((pV0->P() + pV1->P()) * 0.5f);
+		for (auto& pF : faces)
+		{
+			pF->QueryDelete();
+
+			if (pF->E0() == pE || pF->E1() == pE || pF->E2() == pE)
 			{
-				GetOrCreateFace(pn0, pc0, pn1);
-				GetOrCreateFace(pn0, pn1, pc1);
+
 			}
+			else if (pF->V0() == pV0 || pF->V0() == pV1)
+			{
+				GetOrCreateFace(pVN->P(), pF->V1()->P(), pF->V2()->P());
+			}
+			else if (pF->V1() == pV0 || pF->V1() == pV1)
+			{
+				GetOrCreateFace(pF->V0()->P(), pVN->P(), pF->V2()->P());
+			}
+			else if (pF->V2() == pV0 || pF->V2() == pV1)
+			{
+				GetOrCreateFace(pF->V0()->P(), pF->V1()->P(), pVN->P());
+			}
+		}
+	}
+
+	template<typename T>
+	void Mesh<T>::FlipEdge(Edge<T>* pE)
+	{
+		if (pE == nullptr)
+			return;
+
+		auto& faces = pE->GetInsidentFaces();
+		if (faces.size() > 1)
+		{
+			auto& fi = faces.begin();
+			auto pF0 = *fi;
+			fi++;
+			auto pF1 = *fi;
+
+			FlipEdge(pF0, pF1, pE);
+		}
+	}
+
+	template<typename T>
+	void Mesh<T>::FlipEdge(Face<T>* pF0, Face<T>* pF1)
+	{
+		if (pF0 == nullptr || pF1 == nullptr)
+			return;
+
+		auto pE = pF0->GetCommonEdge(pF1);
+		FlipEdge(pF0, pF1, pE);
+	}
+
+	template <typename T>
+	void Mesh<T>::FlipEdge(Face<T>* pF0, Face<T>* pF1, Edge<T>* pE)
+	{
+		if (pF0 == nullptr || pF1 == nullptr || pE == nullptr)
+			return;
+
+		pF0->QueryDelete();
+		pF1->QueryDelete();
+
+		Vertex<T>* pCV0 = nullptr;
+		Vertex<T>* pCV1 = nullptr;
+		Vertex<T>* pNV0 = nullptr;
+		Vertex<T>* pNV1 = nullptr;
+
+		auto& cvs = pE->GetVertices();
+		auto& cvsi = cvs.begin();
+		pCV0 = *cvsi;
+		cvsi++;
+		pCV1 = *cvsi;
+
+		if (pF0->V0() != pCV0 && pF0->V0() != pCV1) pNV0 = pF0->V0();
+		else if (pF0->V1() != pCV0 && pF0->V1() != pCV1) pNV0 = pF0->V1();
+		else if (pF0->V2() != pCV0 && pF0->V2() != pCV1) pNV0 = pF0->V2();
+		else return;
+
+		if (pF1->V0() != pCV0 && pF1->V0() != pCV1) pNV1 = pF1->V0();
+		else if (pF1->V1() != pCV0 && pF1->V1() != pCV1) pNV1 = pF1->V1();
+		else if (pF1->V2() != pCV0 && pF1->V2() != pCV1) pNV1 = pF1->V2();
+		else return;
+
+		auto& pc0 = pCV0->P();
+		auto& pc1 = pCV1->P();
+		auto& pn0 = pNV0->P();
+		auto& pn1 = pNV1->P();
+
+		auto d00 = pn0 - pc0;
+		auto d01 = pn1 - pc0;
+		auto normal = d01 ^ d00;
+		normal.normalize();
+
+		if (pF0->GetFaceNormal() * normal < 0)
+		{
+			GetOrCreateFace(pn1, pc0, pn0);
+			GetOrCreateFace(pc1, pn1, pn0);
+		}
+		else
+		{
+			GetOrCreateFace(pn0, pc0, pn1);
+			GetOrCreateFace(pn0, pn1, pc1);
 		}
 	}
 
