@@ -58,6 +58,8 @@ namespace VEFM
 		void InsertVertex(const T& p);
 		void InsertVertex(Vertex<T>* pV);
 
+		void RefineFace(Face<T>* pF);
+
 		//inline const map<T, Vertex<T>*>& GetVertices() const { return m_vertices; }
 		inline void GetVertices(set<Vertex<T>*>& vertices) const { m_pVolumeInfo->GetAllElements(vertices); }
 		inline const vector<Edge<T>*>& GetEdges() const { return m_edges; }

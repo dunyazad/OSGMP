@@ -75,6 +75,9 @@
     <ClInclude Include="VEFM\VoxelSpace.hpp">
       <Filter>VEFM</Filter>
     </ClInclude>
+    <ClInclude Include="VEFM\Tree.h">
+      <Filter>VEFM</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="VEFM">

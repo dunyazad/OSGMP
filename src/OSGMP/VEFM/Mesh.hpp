@@ -782,6 +782,40 @@ namespace VEFM
 	}
 
 	template <typename T>
+	void Mesh<T>::RefineFace(Face<T>* pF)
+	{
+		set<Vetex<T>*> points;
+		set<Face<T>*> incidentFaces;
+		for (auto& pIF : pF->E0()->GetInsidentFaces())
+		{
+			incidentFaces.insert(pIF);
+		}
+		for (auto& pIF : pF->E1()->GetInsidentFaces())
+		{
+			incidentFaces.insert(pIF);
+		}
+		for (auto& pIF : pF->E2()->GetInsidentFaces())
+		{
+			incidentFaces.insert(pIF);
+		}
+
+		for (auto& pIF : incidentFaces)
+		{
+			points.insert(pIF->V0());
+			points.insert(pIF->V1());
+			points.insert(pIF->V2());
+		}
+
+		for (auto& p : points)
+		{
+			if (p == pF->V0() || p == pF->V1() || p == pF->V2())
+				continue;
+
+
+		}
+	}
+
+	template <typename T>
 	void Mesh<T>::OnQueryDelete()
 	{
 		if (IsDeleteQueried()) return;

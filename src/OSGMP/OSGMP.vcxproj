@@ -109,6 +109,7 @@
     <ClInclude Include="VEFM\Mesh.hpp" />
     <ClInclude Include="VEFM\Octree.h" />
     <ClInclude Include="VEFM\Octree.hpp" />
+    <ClInclude Include="VEFM\Tree.h" />
     <ClInclude Include="VEFM\Vertex.hpp" />
     <ClInclude Include="VEFM\VoxelSpace.h" />
     <ClInclude Include="VEFM\V3.h" />

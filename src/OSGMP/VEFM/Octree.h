@@ -2,16 +2,6 @@
 
 #include "./VEFM_Common.h"
 
-#include <set>
-using namespace std;
-
-#pragma once
-
-#include "./VEFM_Common.h"
-
-#include <set>
-using namespace std;
-
 #define EPSILON 0.000001f
 
 namespace VEFM

@@ -6,3 +6,5 @@
 #include "Edge.h"
 #include "Face.h"
 #include "Mesh.h"
+
+#include "Tree.h"

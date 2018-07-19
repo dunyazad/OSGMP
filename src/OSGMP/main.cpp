@@ -496,6 +496,46 @@ void DrawVolumeInfo(const Octree<Vertex<Vec3>, Vec3>* pVolumeInfo)
 //	}
 //}
 
+void PopulateTree(Tree<int>& tree, TreeNode<int>* pParentNode, const vector<int>& indices, int from, int to)
+{
+	if (to - from > 2)
+	{
+		TreeNode<int>* pLeftChild = tree.CreateNode(pParentNode);
+		PopulateTree(tree, pLeftChild, indices, from, from + (int)((to - from) * 0.5f));
+		TreeNode<int>* pRightChild = tree.CreateNode(pParentNode);
+		PopulateTree(tree, pRightChild, indices, from + (int)((to - from) * 0.5f) + 1, to);
+	}
+	else
+	{
+		for (int i = from; i <= to; i++)
+		{
+			pParentNode->GetElements().push_back(i);
+		}
+	}
+};
+
+void PrintNode(TreeNode<int>* pNode)
+{
+	if (pNode->GetChildren().size() > 0)
+	{
+		for (auto& pC : pNode->GetChildren())
+		{
+			PrintNode(pC);
+		}
+	}
+	//else
+	{
+		if (pNode->GetElements().size() > 0)
+		{
+			printf("Node Name : %s\n", pNode->GetName().c_str());
+			for (auto& i : pNode->GetElements())
+			{
+				printf("%d\n", i);
+			}
+		}
+	}
+}
+
 int main(int argc, char** argv)
 {
 	osgViewer::Viewer viewer;
@@ -533,6 +573,9 @@ int main(int argc, char** argv)
 	pvd->AddTriangle(fv0, fv1, fv2, Vec4(GREEN, 0.3), true);
 
 	vector<Vec3> vertices;
+	vertices.push_back(fv0);
+	vertices.push_back(fv1);
+	vertices.push_back(fv2);
 	vertices.push_back(Vec3(110, 0, -260));
 	vertices.push_back(Vec3(120, 0, -330));
 	vertices.push_back(Vec3(190, 0, -120));
@@ -559,49 +602,19 @@ int main(int argc, char** argv)
 	vertices.push_back(Vec3(380, 0, -330));
 	vertices.push_back(Vec3(360, 0, -220));
 
-	for (unsigned int i = 0; i < vertices.size(); i++)
+	sort(vertices.begin(), vertices.end());
+
+	vector<int> indices;
+	for (int i = 0; i < vertices.size(); i++)
 	{
-		pvd->AddBox(vertices[i], 1, 1, 1, V4_RED, true);
+		indices.push_back(i);
 	}
+	
 
+	Tree<int> tree;
+	PopulateTree(tree, tree.GetRootNode(), indices, 0, indices.size() - 1);
 
-	vector<tuple<Vec3, Vec3, Vec3>> result;
-	g_pMP->Triangulate(fv0, fv1, fv2, vertices, result);
-
-	auto pMesh = g_pMP->GetOrCreateMesh("TEST");
-
-	for (auto& vvv : result)
-	{
-		//pvd->AddTriangle(get<0>(vvv), get<1>(vvv), get<2>(vvv), Vec4(WHITE, 0.3f), false);
-		pMesh->GetOrCreateFace(get<0>(vvv), get<1>(vvv), get<2>(vvv));
-	}
-	g_pMP->UpdateModel("TEST");
-
-	auto nme = pMesh->FindNonManifoldEdges();
-	auto be = pMesh->FindBorderEdges();
-
-	for (auto& pE : nme)
-	{
-		pvd->AddLineByEdge(pE, V4_RED, V4_RED);
-	}
-
-	for (auto& pE : be)
-	{
-		pvd->AddLineByEdge(pE, V4_BLUE, V4_BLUE);
-	}
-
-	//for (unsigned int i = 0; i < vertices.size() - 1; i++)
-	//{
-	//	pvd->AddLine(vertices[i], vertices[i + 1], Vec4(WHITE, 0.1), Vec4(WHITE, 0.1));
-	//}
-
-	//vector<tuple<Vec3, Vec3, Vec3>> result;
-	//Triangluate(fv0, fv1, fv2, vertices, result);
-
-	//for (auto& r : result)
-	//{
-	//	pvd->AddTriangle(get<0>(r), get<1>(r), get<2>(r), V4_RED, false);
-	//}
+	PrintNode(tree.GetRootNode());
 
 	return viewer.run();
 }
