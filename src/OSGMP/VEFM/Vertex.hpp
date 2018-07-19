@@ -32,6 +32,8 @@ namespace VEFM
 	template<typename T>
 	void Vertex<T>::OnQueryDelete()
 	{
+		if (IsDeleteQueried()) return;
+
 		for (auto& pE : m_incidentEdges)
 		{
 			if (pE != nullptr)

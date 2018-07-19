@@ -47,6 +47,8 @@ namespace VEFM
 	template <typename T>
 	void Edge<T>::OnQueryDelete()
 	{
+		if (IsDeleteQueried()) return;
+
 		for (auto& pV : m_vertices)
 		{
 			if (pV != nullptr)

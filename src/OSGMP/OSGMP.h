@@ -64,6 +64,8 @@ public:
 	
 	void SplitFaces(const map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>& input);
 
+	void Triangulate(const T& fv0, const T& fv1, const T& fv2, const vector<T>& points, vector<tuple<T, T, T>>& result);
+
 	inline void SetVD(PrimitiveRendererVEFM<T>* pVD) { m_pVD = pVD; }
 
 private:

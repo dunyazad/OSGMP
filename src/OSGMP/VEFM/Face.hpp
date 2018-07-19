@@ -51,6 +51,8 @@ namespace VEFM
 	template<typename T>
 	void Face<T>::OnQueryDelete()
 	{
+		if (IsDeleteQueried()) return;
+
 		if (m_pE0 != nullptr)
 		{
 			if (m_pE0->IsDeleteQueried() == false)

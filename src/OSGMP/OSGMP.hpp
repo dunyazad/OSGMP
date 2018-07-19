@@ -1266,6 +1266,78 @@ void OSGMP<T>::SplitFaces(const map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>&
 }
 
 template<typename T>
+void OSGMP<T>::Triangulate(const T& fv0, const T& fv1, const T& fv2, const vector<T>& points, vector<tuple<T, T, T>>& result)
+{
+	auto d01 = fv1 - fv0;
+	auto d02 = fv2 - fv0;
+	auto normal = d01 ^ d02;
+	normal.normalize();
+
+	enum AXIS = { AXIS_X, AXIS_Y, AXIS_Z };
+
+	int eliminatedAxis = -1;
+	if (normal.x() > normal.y() && normal.x() > normal.z()) eliminatedAxis = AXIS_X;
+	else if (normal.y() > normal.x() && normal.y() > normal.z()) eliminatedAxis = AXIS_Y;
+	else if (normal.z() > normal.x() && normal.Z() > normal.y()) eliminatedAxis = AXIS_Z;
+	else eliminatedAxis = AXIS_Z;
+
+	T pfv0;
+	T pfv1;
+	T pfv2;
+
+	vector<T> projected;
+
+	switch (eliminatedAxis)
+	{
+	case AXIS_X:
+		pfv0.x() = fv0.y(); pfv0.y() = fv0.z();
+		pfv1.x() = fv1.y(); pfv1.y() = fv1.z();
+		pfv2.x() = fv2.y(); pfv2.y() = fv2.z();
+		for (auto& p : points)
+		{
+			projected.push_back(T(p.y(), p.z(), 0));
+		}
+		break;
+	case AXIS_Y:
+		pfv0.x() = fv0.x(); pfv0.y() = fv0.z();
+		pfv1.x() = fv1.x(); pfv1.y() = fv1.z();
+		pfv2.x() = fv2.x(); pfv2.y() = fv2.z();
+		for (auto& p : points)
+		{
+			projected.push_back(T(p.x(), p.z(), 0));
+		}
+		break;
+	case AXIS_Z:
+		pfv0.x() = fv0.x(); pfv0.y() = fv0.y();
+		pfv1.x() = fv1.x(); pfv1.y() = fv1.y();
+		pfv2.x() = fv2.x(); pfv2.y() = fv2.y();
+		for (auto& p : points)
+		{
+			projected.push_back(T(p.x(), p.y(), 0));
+		}
+		break;
+	default:
+		break;
+	}
+
+	Mesh<T> pMesh = new Mesh<T>();
+	pMesh->GetOrCreateFace(pfv0, pfv1, pfv2);
+
+	for (auto& p : projected)
+	{
+		auto& fi = pMesh->GetFaces().begin();
+		while (fi != pMesh->GetFaces().end())
+		{
+			auto& pF = *fi;
+
+
+
+			fi++;
+		}
+	}
+}
+
+template<typename T>
 void MakeReverse(vector<pair<T, T>>& input)
 {
 	vector<pair<T, T>> temp(input);

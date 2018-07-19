@@ -80,7 +80,10 @@ public:
 					pMesh->PrintInformation();
 
 					//pMesh->CollapseEdge(pE);
-					pMesh->SplitEdge(pE);
+					//pMesh->SplitEdge(pE);
+
+					auto pF = pMesh->GetFace(Vec3(0, 0, 0), Vec3(10, 0, 0), Vec3(5, 0, 5));
+					pMesh->SplitFace(pF, Vec3(5, 0, 2.5));
 
 					g_pMP->UpdateModel();
 

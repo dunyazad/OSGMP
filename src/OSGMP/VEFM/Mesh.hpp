@@ -3,6 +3,73 @@
 namespace VEFM
 {
 	template <typename T>
+	bool PointOnLine(const T& p, const T& la, const T& lb, bool includeVertex)
+	{
+		if (includeVertex)
+		{
+			if (p == la || p == lb)
+			{
+				return true;
+			}
+		}
+		else
+		{
+			if (p == la || p == lb)
+			{
+				return false;
+			}
+		}
+
+		auto d = lb - la;
+
+		auto t = (d * (p - la)) / (d * d);
+		if (includeVertex)
+		{
+			return t >= 0 && t <= 1.0f;
+		}
+		else
+		{
+			return t > 0 && t < 1.0f;
+		}
+	}
+
+	template <typename T>
+	bool PointOnTriangle(const T& p, const T& a, const T& b, const T& c, bool bIncludeEdge)
+	{
+		auto v0 = c - a;
+		auto v1 = b - a;
+		auto v2 = p - a;
+
+		auto dot00 = v0 * v0;
+		auto dot01 = v0 * v1;
+		auto dot02 = v0 * v2;
+		auto dot11 = v1 * v1;
+		auto dot12 = v1 * v2;
+
+		auto invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+		auto u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+		auto v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+		// Check if point is in triangle
+		if (bIncludeEdge)
+		{
+			return (u >= 0) && (v >= 0) && (u + v <= 1);
+		}
+		else
+		{
+			return (u > 0) && (v > 0) && (u + v < 1);
+		}
+	}
+
+	template<typename T>
+	bool EnableToTriangle(const T& p0, const T& p1, const T& p2)
+	{
+		auto d01 = p1 - p0;
+		auto d02 = p2 - p0;
+		return (d01 * d02) != 0;
+	}
+
+	template <typename T>
 	Mesh<T>::Mesh()
 	{
 	}
@@ -643,8 +710,57 @@ namespace VEFM
 	}
 
 	template <typename T>
+	void Mesh<T>::SplitFace(Face<T>* pF, const T& position)
+	{
+		if (pF == nullptr)
+			return;
+
+		if (PointOnTriangle<T>(position, pF->V0()->P(), pF->V1()->P(), pF->V2()->P(), true))
+		{
+			if (EnableToTriangle(pF->V0()->P(), pF->V1()->P(), position))
+			{
+				pF->QueryDelete();
+				GetOrCreateFace(pF->V0()->P(), pF->V1()->P(), position);
+			}
+			else
+			{
+				SplitEdge(pF->E0());
+				return;
+			}
+			if (EnableToTriangle(pF->V1()->P(), pF->V2()->P(), position))
+			{
+				pF->QueryDelete();
+				GetOrCreateFace(pF->V1()->P(), pF->V2()->P(), position);
+			}
+			else
+			{
+				SplitEdge(pF->E1());
+				return;
+			}
+			if (EnableToTriangle(pF->V2()->P(), pF->V0()->P(), position))
+			{
+				pF->QueryDelete();
+				GetOrCreateFace(pF->V2()->P(), pF->V0()->P(), position);
+			}
+			else
+			{
+				SplitEdge(pF->E2());
+				return;
+			}
+		}
+	}
+
+	template <typename T>
+	void Mesh<T>::SplitFace(Face<T>* pF, Vertex<T>* pV)
+	{
+		SplitFace(pF, pV->P());
+	}
+
+	template <typename T>
 	void Mesh<T>::OnQueryDelete()
 	{
+		if (IsDeleteQueried()) return;
+
 		for (auto& pF : m_faces)
 		{
 			pF->QueryDelete();

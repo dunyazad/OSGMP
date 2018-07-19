@@ -16,13 +16,13 @@ namespace VEFM
 		inline Vertex<T>* V1() { return m_pV1; }
 		inline Vertex<T>* V2() { return m_pV2; }
 
-		inline const Edge<T>* GetEdge0() const { return m_pE0; }
-		inline const Edge<T>* GetEdge1() const { return m_pE1; }
-		inline const Edge<T>* GetEdge2() const { return m_pE2; }
+		inline Edge<T>* GetEdge0() { return m_pE0; }
+		inline Edge<T>* GetEdge1() { return m_pE1; }
+		inline Edge<T>* GetEdge2() { return m_pE2; }
 
-		inline const Edge<T>* E0() const { return m_pE0; }
-		inline const Edge<T>* E1() const { return m_pE1; }
-		inline const Edge<T>* E2() const { return m_pE2; }
+		inline Edge<T>* E0() { return m_pE0; }
+		inline Edge<T>* E1() { return m_pE1; }
+		inline Edge<T>* E2() { return m_pE2; }
 
 		inline const T& GetFaceNormal() const { return m_faceNormal; }
 		inline const T& GetFaceCenter() const { return m_faceCenter; }
