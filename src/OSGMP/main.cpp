@@ -527,42 +527,68 @@ int main(int argc, char** argv)
 	/*mp.LoadABDFile("Mx", "../../res/MxBone.abd");
 	mp.LoadABDFile("MxTeeth", "../../res/MxTeeth.abd");*/
 
-	//Vec3 fv0(0, 0, -400);
-	//Vec3 fv1(250, 0, 0);
-	//Vec3 fv2(500, 0, -400);
-	//pvd->AddTriangle(fv0, fv1, fv2, Vec4(GREEN, 0.3), true);
+	Vec3 fv0(0, 0, -400);
+	Vec3 fv1(250, 0, 0);
+	Vec3 fv2(500, 0, -400);
+	pvd->AddTriangle(fv0, fv1, fv2, Vec4(GREEN, 0.3), true);
 
-	//vector<Vec3> vertices;
-	//vertices.push_back(Vec3(110, 0, -260));
-	//vertices.push_back(Vec3(120, 0, -330));
-	//vertices.push_back(Vec3(190, 0, -120));
-	//vertices.push_back(Vec3(230, 0, -180));
-	//vertices.push_back(Vec3(170, 0, -230));
-	//vertices.push_back(Vec3(200, 0, -250));
-	//vertices.push_back(Vec3(150, 0, -310));
-	//vertices.push_back(Vec3(230, 0, -300));
-	//vertices.push_back(Vec3(230, 0, -210));
-	//vertices.push_back(Vec3(270, 0, -190));
-	//vertices.push_back(Vec3(240, 0, -130));
-	//vertices.push_back(Vec3(230, 0, -70));
-	//vertices.push_back(Vec3(280, 0, -100));
-	//vertices.push_back(Vec3(310, 0, -210));
-	//vertices.push_back(Vec3(240, 0, -250));
-	//vertices.push_back(Vec3(270, 0, -270));
-	//vertices.push_back(Vec3(290, 0, -230));
-	//vertices.push_back(Vec3(330, 0, -240));
-	//vertices.push_back(Vec3(340, 0, -270));
-	//vertices.push_back(Vec3(320, 0, -320));
-	//vertices.push_back(Vec3(130, 0, -360));
-	//vertices.push_back(Vec3(390, 0, -380));
-	//vertices.push_back(Vec3(270, 0, -350));
-	//vertices.push_back(Vec3(380, 0, -330));
-	//vertices.push_back(Vec3(360, 0, -220));
+	vector<Vec3> vertices;
+	vertices.push_back(Vec3(110, 0, -260));
+	vertices.push_back(Vec3(120, 0, -330));
+	vertices.push_back(Vec3(190, 0, -120));
+	vertices.push_back(Vec3(230, 0, -180));
+	vertices.push_back(Vec3(170, 0, -230));
+	vertices.push_back(Vec3(200, 0, -250));
+	vertices.push_back(Vec3(150, 0, -310));
+	vertices.push_back(Vec3(230, 0, -300));
+	vertices.push_back(Vec3(230, 0, -210));
+	vertices.push_back(Vec3(270, 0, -190));
+	vertices.push_back(Vec3(240, 0, -130));
+	vertices.push_back(Vec3(230, 0, -70));
+	vertices.push_back(Vec3(280, 0, -100));
+	vertices.push_back(Vec3(310, 0, -210));
+	vertices.push_back(Vec3(240, 0, -250));
+	vertices.push_back(Vec3(270, 0, -270));
+	vertices.push_back(Vec3(290, 0, -230));
+	vertices.push_back(Vec3(330, 0, -240));
+	vertices.push_back(Vec3(340, 0, -270));
+	vertices.push_back(Vec3(320, 0, -320));
+	vertices.push_back(Vec3(130, 0, -360));
+	vertices.push_back(Vec3(390, 0, -380));
+	vertices.push_back(Vec3(270, 0, -350));
+	vertices.push_back(Vec3(380, 0, -330));
+	vertices.push_back(Vec3(360, 0, -220));
 
-	//for (unsigned int i = 0; i < vertices.size(); i++)
-	//{
-	//	pvd->AddBox(vertices[i], 1, 1, 1, V4_WHITE, true);
-	//}
+	for (unsigned int i = 0; i < vertices.size(); i++)
+	{
+		pvd->AddBox(vertices[i], 1, 1, 1, V4_RED, true);
+	}
+
+
+	vector<tuple<Vec3, Vec3, Vec3>> result;
+	g_pMP->Triangulate(fv0, fv1, fv2, vertices, result);
+
+	auto pMesh = g_pMP->GetOrCreateMesh("TEST");
+
+	for (auto& vvv : result)
+	{
+		//pvd->AddTriangle(get<0>(vvv), get<1>(vvv), get<2>(vvv), Vec4(WHITE, 0.3f), false);
+		pMesh->GetOrCreateFace(get<0>(vvv), get<1>(vvv), get<2>(vvv));
+	}
+	g_pMP->UpdateModel("TEST");
+
+	auto nme = pMesh->FindNonManifoldEdges();
+	auto be = pMesh->FindBorderEdges();
+
+	for (auto& pE : nme)
+	{
+		pvd->AddLineByEdge(pE, V4_RED, V4_RED);
+	}
+
+	for (auto& pE : be)
+	{
+		pvd->AddLineByEdge(pE, V4_BLUE, V4_BLUE);
+	}
 
 	//for (unsigned int i = 0; i < vertices.size() - 1; i++)
 	//{

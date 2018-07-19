@@ -1273,68 +1273,51 @@ void OSGMP<T>::Triangulate(const T& fv0, const T& fv1, const T& fv2, const vecto
 	auto normal = d01 ^ d02;
 	normal.normalize();
 
-	enum AXIS = { AXIS_X, AXIS_Y, AXIS_Z };
+	auto center = (fv0 + fv1 + fv2) / 3;
 
-	int eliminatedAxis = -1;
-	if (normal.x() > normal.y() && normal.x() > normal.z()) eliminatedAxis = AXIS_X;
-	else if (normal.y() > normal.x() && normal.y() > normal.z()) eliminatedAxis = AXIS_Y;
-	else if (normal.z() > normal.x() && normal.Z() > normal.y()) eliminatedAxis = AXIS_Z;
-	else eliminatedAxis = AXIS_Z;
+	Matrix m;
+	m.makeRotate(T(0, 0, 1), normal);
+	m.setTrans(center);
 
-	T pfv0;
-	T pfv1;
-	T pfv2;
+	auto im = Matrix::inverse(m);
+
+	auto pfv0 = fv0 * im;
+	auto pfv1 = fv1 * im;
+	auto pfv2 = fv2 * im;
 
 	vector<T> projected;
-
-	switch (eliminatedAxis)
+	for (auto& p : points)
 	{
-	case AXIS_X:
-		pfv0.x() = fv0.y(); pfv0.y() = fv0.z();
-		pfv1.x() = fv1.y(); pfv1.y() = fv1.z();
-		pfv2.x() = fv2.y(); pfv2.y() = fv2.z();
-		for (auto& p : points)
-		{
-			projected.push_back(T(p.y(), p.z(), 0));
-		}
-		break;
-	case AXIS_Y:
-		pfv0.x() = fv0.x(); pfv0.y() = fv0.z();
-		pfv1.x() = fv1.x(); pfv1.y() = fv1.z();
-		pfv2.x() = fv2.x(); pfv2.y() = fv2.z();
-		for (auto& p : points)
-		{
-			projected.push_back(T(p.x(), p.z(), 0));
-		}
-		break;
-	case AXIS_Z:
-		pfv0.x() = fv0.x(); pfv0.y() = fv0.y();
-		pfv1.x() = fv1.x(); pfv1.y() = fv1.y();
-		pfv2.x() = fv2.x(); pfv2.y() = fv2.y();
-		for (auto& p : points)
-		{
-			projected.push_back(T(p.x(), p.y(), 0));
-		}
-		break;
-	default:
-		break;
+		projected.push_back(p * im);
 	}
 
-	Mesh<T> pMesh = new Mesh<T>();
+	Mesh<T>* pMesh = new Mesh<T>();
 	pMesh->GetOrCreateFace(pfv0, pfv1, pfv2);
 
+
+	vector<tuple<T, T, T>> trianglePoints;
+	for (auto& pF : pMesh->GetFaces())
+	{
+		trianglePoints.push_back(make_tuple(pF->V0()->P(), pF->V1()->P(), pF->V2()->P()));
+	}
+
+	int i = 0;
 	for (auto& p : projected)
 	{
-		auto& fi = pMesh->GetFaces().begin();
-		while (fi != pMesh->GetFaces().end())
+		pMesh->InsertVertex(p);
+	}
+
+	pMesh->Refresh();
+
+	for (auto& pF : pMesh->GetFaces())
+	{
+		if (pF->IsDeleteQueried() == false)
 		{
-			auto& pF = *fi;
-
-
-
-			fi++;
+			result.push_back(make_tuple(pF->V0()->P() * m, pF->V1()->P() * m, pF->V2()->P() * m));
 		}
 	}
+
+	delete pMesh;
 }
 
 template<typename T>

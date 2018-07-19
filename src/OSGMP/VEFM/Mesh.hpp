@@ -757,6 +757,31 @@ namespace VEFM
 	}
 
 	template <typename T>
+	void Mesh<T>::InsertVertex(const T& p)
+	{
+		Face<T>* pFace = nullptr;
+		for (auto& pF : m_faces)
+		{
+			if (pF->IsDeleteQueried())
+				continue;
+
+			if (PointOnTriangle(p, pF->V0()->P(), pF->V1()->P(), pF->V2()->P(), true))
+			{
+				pFace = pF;
+				break;
+			}
+		}
+
+		SplitFace(pFace, p);
+	}
+
+	template <typename T>
+	void Mesh<T>::InsertVertex(Vertex<T>* pV)
+	{
+		InsertVertex(pV->P());
+	}
+
+	template <typename T>
 	void Mesh<T>::OnQueryDelete()
 	{
 		if (IsDeleteQueried()) return;

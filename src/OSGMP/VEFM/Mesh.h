@@ -55,6 +55,9 @@ namespace VEFM
 		void SplitFace(Face<T>* pF, const T& position);
 		void SplitFace(Face<T>* pF, Vertex<T>* pV);
 
+		void InsertVertex(const T& p);
+		void InsertVertex(Vertex<T>* pV);
+
 		//inline const map<T, Vertex<T>*>& GetVertices() const { return m_vertices; }
 		inline void GetVertices(set<Vertex<T>*>& vertices) const { m_pVolumeInfo->GetAllElements(vertices); }
 		inline const vector<Edge<T>*>& GetEdges() const { return m_edges; }
