@@ -50,8 +50,9 @@ namespace VEFM
 
 		Edge<T>* FindFirstMetBorderEdge();
 		vector<Edge<T>*> FindBorderEdges();
+		vector<Edge<T>*> FindFirstMetNonManifoldEdges(); 
 		vector<Edge<T>*> FindNonManifoldEdges();
-
+		
 		void SplitFace(Face<T>* pF, const T& position);
 		void SplitFace(Face<T>* pF, Vertex<T>* pV);
 

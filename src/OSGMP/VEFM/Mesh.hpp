@@ -694,6 +694,18 @@ namespace VEFM
 	}
 
 	template <typename T>
+	vector<Edge<T>*> Mesh<T>::FindFirstMetNonManifoldEdges()
+	{
+		for (auto& pE : m_edges)
+		{
+			if (pE->GetInsidentFaces().size() > 2)
+			{
+				return pE;
+			}
+		}
+	}
+
+	template <typename T>
 	vector<Edge<T>*> Mesh<T>::FindNonManifoldEdges()
 	{
 		vector<Edge<T>*> result;

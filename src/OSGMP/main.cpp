@@ -12,6 +12,11 @@ ref_ptr<Group> g_pRootNode;
 
 StopWatch g_stopWatch;
 
+map<tuple<Mesh<Vec3>*, Face<Vec3>*>, set<pair<Vec3, Vec3>>> g_result;
+int g_count = 0;
+
+set<Edge<Vec3>*> g_visitedEdges;
+
 class KeyboardEventHandler : public osgGA::GUIEventHandler
 {
 public:
@@ -103,7 +108,20 @@ public:
 					auto&& edges = pMesh->FindNonManifoldEdges();
 					for (auto& pE : edges)
 					{
-						pvd->AddLineByEdge(pE, V4_RED, V4_RED);
+						if (g_visitedEdges.count(pE) == 0)
+						{
+							g_visitedEdges.insert(pE);
+
+							pvd->AddLineByEdge(pE, V4_GREEN, V4_GREEN);
+							for (auto& pF : pE->GetInsidentFaces())
+							{
+								pvd->AddTriangleByFace(pF, V4_RED, true);
+								pvd->AddBox(pF->V0()->P(), 0.01f, 0.01f, 0.01f, V4_RED, true);
+								pvd->AddBox(pF->V1()->P(), 0.008f, 0.008f, 0.008f, V4_GREEN, true);
+								pvd->AddBox(pF->V2()->P(), 0.004f, 0.004f, 0.004f, V4_BLUE, true);
+							}
+							break;
+						}
 					}
 				}
 				return true;
@@ -120,11 +138,11 @@ public:
 			case 'z':
 				printf("Z\n");
 				{
-					map<tuple<Mesh<Vec3>*, Face<Vec3>*>, set<pair<Vec3, Vec3>>> result;
+					//map<tuple<Mesh<Vec3>*, Face<Vec3>*>, set<pair<Vec3, Vec3>>> result;
 					
 					g_stopWatch.Start();
 					
-					g_pMP->CheckIntersection("Mx", "MxTeeth", result);
+					g_pMP->CheckIntersection("Mx", "MxTeeth", g_result);
 					
 					auto seconds = g_stopWatch.Stop().first;
 					printf("seconds %f\n", seconds);
@@ -137,7 +155,7 @@ public:
 					//	}
 					//}
 
-					g_pMP->SplitFaces(result);
+					g_pMP->SplitFaces(g_result);
 
 					g_pMP->UpdateModel();
 				}
@@ -145,30 +163,24 @@ public:
 			case 'x':
 				printf("X\n");
 				{
-					vector<string> names;
-					names.push_back("T11"); names.push_back("T12"); names.push_back("T13"); names.push_back("T14"); names.push_back("T15"); names.push_back("T16"); names.push_back("T17");
-					names.push_back("T21"); names.push_back("T22"); names.push_back("T23"); names.push_back("T24"); names.push_back("T25"); names.push_back("T26"); names.push_back("T27");
-
-					map<tuple<Mesh<Vec3>*, Face<Vec3>*>, set<pair<Vec3, Vec3>>> result;
-
-					g_stopWatch.Start();
-
-					g_pMP->CheckIntersections("Mx", names, result);
-
-					auto seconds = g_stopWatch.Stop().first;
-					printf("seconds %f\n", seconds);
-
-					for (auto& kvp : result)
+					int cnt = -1;
+					for (auto& kvp : g_result)
 					{
-						for (auto& vv : kvp.second)
+						cnt++;
+						if (cnt == g_count)
 						{
-							//pvd->AddLine(V3toVec3(vv.first), V3toVec3(vv.second), V4_RED, V4_RED);
+							g_count++;
+
+							pvd->AddTriangleByFace(get<1>(kvp.first), V4_RED, true);
+							for (auto& vv : kvp.second)
+							{
+								pvd->AddLine(vv.first, vv.second, V4_GREEN, V4_GREEN);
+							}
+
+							
+							break;
 						}
 					}
-
-					g_pMP->SplitFaces(result);
-
-					g_pMP->UpdateModel();
 				}
 				return false;
 
@@ -559,13 +571,12 @@ int main(int argc, char** argv)
 	// add a viewport to the viewer and attach the scene graph.
 	viewer.setSceneData(g_pRootNode);
 
-
 	OSGMP<Vec3> mp(g_pRootNode);
 	g_pMP = &mp;
 	g_pMP->SetVD(pvd);
 
-	/*mp.LoadABDFile("Mx", "../../res/MxBone.abd");
-	mp.LoadABDFile("MxTeeth", "../../res/MxTeeth.abd");*/
+	mp.LoadABDFile("Mx", "../../res/MxBone.abd");
+	mp.LoadABDFile("MxTeeth", "../../res/MxTeeth.abd");
 
 	//Vec3 fv0(0, 0, -400);
 	//Vec3 fv1(250, 0, 0);
@@ -625,31 +636,31 @@ int main(int argc, char** argv)
 
 
 
-	mp.LoadABDFile("Mx", "../../res/random plane.abd");
-	auto pMesh = mp.GetMesh("Mx");
+	//mp.LoadABDFile("Mx", "../../res/random plane.abd");
+	//auto pMesh = mp.GetMesh("Mx");
 
-	auto pMD = mp.GetOrCreateMesh("Md");
+	//auto pMD = mp.GetOrCreateMesh("Md");
 
-	Vec3 normal(0, 1, -1);
-	Vec3 position(0, 0, 10);
+	//Vec3 normal(0, -1, -1);
+	//Vec3 position(0, 0, 10);
 
-	for (auto& pF : pMesh->GetFaces())
-	{
-		auto& p0 = pF->V0()->P();
-		auto& p1 = pF->V1()->P();
-		auto& p2 = pF->V2()->P();
-		
-		Vec3 np0;
-		Vec3 np1;
-		Vec3 np2;
-		bool r0 = IntersectRayPlane<Vec3>(p0, -normal, position, normal, np0);
-		bool r1 = IntersectRayPlane<Vec3>(p1, -normal, position, normal, np1);
-		bool r2 = IntersectRayPlane<Vec3>(p2, -normal, position, normal, np2);
+	//for (auto& pF : pMesh->GetFaces())
+	//{
+	//	auto& p0 = pF->V0()->P();
+	//	auto& p1 = pF->V1()->P();
+	//	auto& p2 = pF->V2()->P();
+	//	
+	//	Vec3 np0;
+	//	Vec3 np1;
+	//	Vec3 np2;
+	//	bool r0 = IntersectRayPlane<Vec3>(p0, -normal, position, normal, np0);
+	//	bool r1 = IntersectRayPlane<Vec3>(p1, -normal, position, normal, np1);
+	//	bool r2 = IntersectRayPlane<Vec3>(p2, -normal, position, normal, np2);
 
-		pMD->GetOrCreateFace(np0, np1, np2);
-	}
+	//	pMD->GetOrCreateFace(np0, np1, np2);
+	//}
 
-	mp.UpdateModel();
+	//mp.UpdateModel();
 
 	return viewer.run();
 }

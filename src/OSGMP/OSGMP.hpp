@@ -1206,6 +1206,8 @@ void OSGMP<T>::SplitFaces(const map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>&
 	{
 		auto pMesh = get<0>(kvp.first);
 		auto pF = get<1>(kvp.first);
+		if (pF->IsDeleteQueried())
+			continue;
 
 		auto fv0 = pF->V0()->P();
 		auto fv1 = pF->V1()->P();
@@ -1216,10 +1218,14 @@ void OSGMP<T>::SplitFaces(const map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>&
 		set<Vec3> vertices;
 		for (auto& vv : kvp.second)
 		{
-			vertices.insert(vv.first);
-			vertices.insert(vv.second);
+			if (fv0 != vv.first && fv1 != vv.first && fv2 != vv.first)
+				vertices.insert(vv.first);
+			if (fv0 != vv.second && fv1 != vv.second && fv2 != vv.second)
+				vertices.insert(vv.second);
 		}
 
+		vector<Vec3> points(vertices.begin(), vertices.end());
+		
 		//vector<pair<T, T>> input;
 		//for (auto& vv : kvp.second)
 		//{
@@ -1240,13 +1246,26 @@ void OSGMP<T>::SplitFaces(const map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>&
 
 		vector<tuple<Vec3, Vec3, Vec3>> triangulated;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////		BowyerWatson(fv0, fv1, fv2, points, triangulated);
+		Triangulate(fv0, fv1, fv2, points, triangulated);
 		//SplitTriangleByPoints(TTT(fv0, fv1, fv2), edges, triangulated);
 
 		for (auto& vvv : triangulated)
 		{
 			////if (vvv.v0 != vvv.v1 && vvv.v0 != vvv.v2 && vvv.v1 != vvv.v2)
 			//{
-			pMesh->GetOrCreateFace(get<0>(vvv), get<1>(vvv), get<2>(vvv));
+			auto& v0 = get<0>(vvv);
+			auto& v1 = get<1>(vvv);
+			auto& v2 = get<2>(vvv);
+
+			if (v0 != v1 && v0 != v2 && v1 != v2)
+			{
+				auto d01 = v1 - v0;
+				auto d02 = v2 - v0;
+				if (d01 * d02 > EPSILON)
+				{
+					pMesh->GetOrCreateFace(v0, v1, v2);
+				}
+			}
 			//}
 			//else
 			//{
@@ -1265,6 +1284,61 @@ void OSGMP<T>::SplitFaces(const map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>&
 	}
 }
 
+//template<typename T>
+//void OSGMP<T>::Triangulate(const T& fv0, const T& fv1, const T& fv2, const vector<T>& points, vector<tuple<T, T, T>>& result)
+//{
+//	auto d01 = fv1 - fv0;
+//	auto d02 = fv2 - fv0;
+//	auto normal = d01 ^ d02;
+//	normal.normalize();
+//
+//	auto center = (fv0 + fv1 + fv2) / 3;
+//
+//	Matrix m;
+//	m.makeRotate(T(0, 0, 1), normal);
+//	m.setTrans(center);
+//
+//	auto im = Matrix::inverse(m);
+//
+//	auto pfv0 = fv0 * im;
+//	auto pfv1 = fv1 * im;
+//	auto pfv2 = fv2 * im;
+//
+//	vector<T> projected;
+//	for (auto& p : points)
+//	{
+//		projected.push_back(p * im);
+//	}
+//
+//	Mesh<T>* pMesh = new Mesh<T>();
+//	pMesh->GetOrCreateFace(pfv0, pfv1, pfv2);
+//
+//
+//	vector<tuple<T, T, T>> trianglePoints;
+//	for (auto& pF : pMesh->GetFaces())
+//	{
+//		trianglePoints.push_back(make_tuple(pF->V0()->P(), pF->V1()->P(), pF->V2()->P()));
+//	}
+//
+//	int i = 0;
+//	for (auto& p : projected)
+//	{
+//		pMesh->InsertVertex(p);
+//	}
+//
+//	pMesh->Refresh();
+//
+//	for (auto& pF : pMesh->GetFaces())
+//	{
+//		if (pF->IsDeleteQueried() == false)
+//		{
+//			result.push_back(make_tuple(pF->V0()->P() * m, pF->V1()->P() * m, pF->V2()->P() * m));
+//		}
+//	}
+//
+//	delete pMesh;
+//}
+
 template<typename T>
 void OSGMP<T>::Triangulate(const T& fv0, const T& fv1, const T& fv2, const vector<T>& points, vector<tuple<T, T, T>>& result)
 {
@@ -1275,49 +1349,39 @@ void OSGMP<T>::Triangulate(const T& fv0, const T& fv1, const T& fv2, const vecto
 
 	auto center = (fv0 + fv1 + fv2) / 3;
 
-	Matrix m;
-	m.makeRotate(T(0, 0, 1), normal);
-	m.setTrans(center);
-
-	auto im = Matrix::inverse(m);
-
-	auto pfv0 = fv0 * im;
-	auto pfv1 = fv1 * im;
-	auto pfv2 = fv2 * im;
-
 	vector<T> projected;
-	for (auto& p : points)
+
+	ProjectToPlane(center, normal, points, projected);
+
+	ref_ptr<Vec3Array> pVertices = new Vec3Array(projected.begin(), projected.end());
+	pVertices->push_back(fv0);
+	pVertices->push_back(fv1);
+	pVertices->push_back(fv2);
+	
+	ref_ptr<osgUtil::DelaunayTriangulator> pDT = new osgUtil::DelaunayTriangulator;
+	pDT->setInputPointArray(pVertices);
+	pDT->triangulate();
+
+	auto pTriangles = pDT->getTriangles();
+	for (unsigned int i = 0; i < pTriangles->size() / 3; i++)
 	{
-		projected.push_back(p * im);
-	}
+		auto& v0 = pVertices->at(pDT->getTriangles()->at(i * 3 + 0));
+		auto& v1 = pVertices->at(pDT->getTriangles()->at(i * 3 + 1));
+		auto& v2 = pVertices->at(pDT->getTriangles()->at(i * 3 + 2));
 
-	Mesh<T>* pMesh = new Mesh<T>();
-	pMesh->GetOrCreateFace(pfv0, pfv1, pfv2);
-
-
-	vector<tuple<T, T, T>> trianglePoints;
-	for (auto& pF : pMesh->GetFaces())
-	{
-		trianglePoints.push_back(make_tuple(pF->V0()->P(), pF->V1()->P(), pF->V2()->P()));
-	}
-
-	int i = 0;
-	for (auto& p : projected)
-	{
-		pMesh->InsertVertex(p);
-	}
-
-	pMesh->Refresh();
-
-	for (auto& pF : pMesh->GetFaces())
-	{
-		if (pF->IsDeleteQueried() == false)
+		auto vd01 = v1 - v0;
+		auto vd02 = v2 - v0;
+		auto vnormal = vd01 ^ vd02;
+		vnormal.normalize();
+		if (normal * vnormal < 0)
 		{
-			result.push_back(make_tuple(pF->V0()->P() * m, pF->V1()->P() * m, pF->V2()->P() * m));
+			result.push_back(make_tuple(v0, v2, v1));
+		}
+		else
+		{
+			result.push_back(make_tuple(v0, v1, v2));
 		}
 	}
-
-	delete pMesh;
 }
 
 template<typename T>
