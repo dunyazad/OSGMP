@@ -1321,6 +1321,23 @@ void OSGMP<T>::Triangulate(const T& fv0, const T& fv1, const T& fv2, const vecto
 }
 
 template<typename T>
+void OSGMP<T>::ProjectToPlane(const T& planePosition, const T& planeNormal, const vector<T>& inputPoints, vector<T>& projectedPoints)
+{
+	for (auto& ip : inputPoints)
+	{
+		T rp;
+		if (IntersectRayPlane<T>(ip, -planeNormal, planePosition, planeNormal, rp))
+		{
+			projectedPoints.push_back(rp);
+		}
+		else
+		{
+			projectedPoints.push_back(ip);
+		}
+	}
+}
+
+template<typename T>
 void MakeReverse(vector<pair<T, T>>& input)
 {
 	vector<pair<T, T>> temp(input);

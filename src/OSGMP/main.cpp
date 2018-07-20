@@ -567,54 +567,89 @@ int main(int argc, char** argv)
 	/*mp.LoadABDFile("Mx", "../../res/MxBone.abd");
 	mp.LoadABDFile("MxTeeth", "../../res/MxTeeth.abd");*/
 
-	Vec3 fv0(0, 0, -400);
-	Vec3 fv1(250, 0, 0);
-	Vec3 fv2(500, 0, -400);
-	pvd->AddTriangle(fv0, fv1, fv2, Vec4(GREEN, 0.3), true);
+	//Vec3 fv0(0, 0, -400);
+	//Vec3 fv1(250, 0, 0);
+	//Vec3 fv2(500, 0, -400);
+	//pvd->AddTriangle(fv0, fv1, fv2, Vec4(GREEN, 0.3), true);
 
-	vector<Vec3> vertices;
-	vertices.push_back(fv0);
-	vertices.push_back(fv1);
-	vertices.push_back(fv2);
-	vertices.push_back(Vec3(110, 0, -260));
-	vertices.push_back(Vec3(120, 0, -330));
-	vertices.push_back(Vec3(190, 0, -120));
-	vertices.push_back(Vec3(230, 0, -180));
-	vertices.push_back(Vec3(170, 0, -230));
-	vertices.push_back(Vec3(200, 0, -250));
-	vertices.push_back(Vec3(150, 0, -310));
-	vertices.push_back(Vec3(230, 0, -300));
-	vertices.push_back(Vec3(230, 0, -210));
-	vertices.push_back(Vec3(270, 0, -190));
-	vertices.push_back(Vec3(240, 0, -130));
-	vertices.push_back(Vec3(230, 0, -70));
-	vertices.push_back(Vec3(280, 0, -100));
-	vertices.push_back(Vec3(310, 0, -210));
-	vertices.push_back(Vec3(240, 0, -250));
-	vertices.push_back(Vec3(270, 0, -270));
-	vertices.push_back(Vec3(290, 0, -230));
-	vertices.push_back(Vec3(330, 0, -240));
-	vertices.push_back(Vec3(340, 0, -270));
-	vertices.push_back(Vec3(320, 0, -320));
-	vertices.push_back(Vec3(130, 0, -360));
-	vertices.push_back(Vec3(390, 0, -380));
-	vertices.push_back(Vec3(270, 0, -350));
-	vertices.push_back(Vec3(380, 0, -330));
-	vertices.push_back(Vec3(360, 0, -220));
+	//vector<Vec3> vertices;
+	//vertices.push_back(fv0);
+	//vertices.push_back(fv1);
+	//vertices.push_back(fv2);
+	//vertices.push_back(Vec3(110, 0, -260));
+	//vertices.push_back(Vec3(120, 0, -330));
+	//vertices.push_back(Vec3(190, 0, -120));
+	//vertices.push_back(Vec3(230, 0, -180));
+	//vertices.push_back(Vec3(170, 0, -230));
+	//vertices.push_back(Vec3(200, 0, -250));
+	//vertices.push_back(Vec3(150, 0, -310));
+	//vertices.push_back(Vec3(230, 0, -300));
+	//vertices.push_back(Vec3(230, 0, -210));
+	//vertices.push_back(Vec3(270, 0, -190));
+	//vertices.push_back(Vec3(240, 0, -130));
+	//vertices.push_back(Vec3(230, 0, -70));
+	//vertices.push_back(Vec3(280, 0, -100));
+	//vertices.push_back(Vec3(310, 0, -210));
+	//vertices.push_back(Vec3(240, 0, -250));
+	//vertices.push_back(Vec3(270, 0, -270));
+	//vertices.push_back(Vec3(290, 0, -230));
+	//vertices.push_back(Vec3(330, 0, -240));
+	//vertices.push_back(Vec3(340, 0, -270));
+	//vertices.push_back(Vec3(320, 0, -320));
+	//vertices.push_back(Vec3(130, 0, -360));
+	//vertices.push_back(Vec3(390, 0, -380));
+	//vertices.push_back(Vec3(270, 0, -350));
+	//vertices.push_back(Vec3(380, 0, -330));
+	//vertices.push_back(Vec3(360, 0, -220));
 
-	sort(vertices.begin(), vertices.end());
+	//sort(vertices.begin(), vertices.end());
 
-	vector<int> indices;
-	for (int i = 0; i < vertices.size(); i++)
+	//vector<int> indices;
+	//for (int i = 0; i < vertices.size(); i++)
+	//{
+	//	indices.push_back(i);
+	//}
+	//
+
+	//Tree<int> tree;
+	//PopulateTree(tree, tree.GetRootNode(), indices, 0, indices.size() - 1);
+
+	//PrintNode(tree.GetRootNode());
+
+
+
+
+
+
+
+
+
+
+	mp.LoadABDFile("Mx", "../../res/random plane.abd");
+	auto pMesh = mp.GetMesh("Mx");
+
+	auto pMD = mp.GetOrCreateMesh("Md");
+
+	Vec3 normal(0, 1, -1);
+	Vec3 position(0, 0, 10);
+
+	for (auto& pF : pMesh->GetFaces())
 	{
-		indices.push_back(i);
+		auto& p0 = pF->V0()->P();
+		auto& p1 = pF->V1()->P();
+		auto& p2 = pF->V2()->P();
+		
+		Vec3 np0;
+		Vec3 np1;
+		Vec3 np2;
+		bool r0 = IntersectRayPlane<Vec3>(p0, -normal, position, normal, np0);
+		bool r1 = IntersectRayPlane<Vec3>(p1, -normal, position, normal, np1);
+		bool r2 = IntersectRayPlane<Vec3>(p2, -normal, position, normal, np2);
+
+		pMD->GetOrCreateFace(np0, np1, np2);
 	}
-	
 
-	Tree<int> tree;
-	PopulateTree(tree, tree.GetRootNode(), indices, 0, indices.size() - 1);
-
-	PrintNode(tree.GetRootNode());
+	mp.UpdateModel();
 
 	return viewer.run();
 }

@@ -91,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\OSGCommon.h" />
+    <ClInclude Include="Algorithm\Intersections.h" />
     <ClInclude Include="Algorithm\MPE_fastpoly2tri.h" />
     <ClInclude Include="Algorithm\tri_aabb_intersection.h" />
     <ClInclude Include="Algorithm\tri_tri_intersection.h" />

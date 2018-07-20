@@ -78,6 +78,9 @@
     <ClInclude Include="VEFM\Tree.h">
       <Filter>VEFM</Filter>
     </ClInclude>
+    <ClInclude Include="Algorithm\Intersections.h">
+      <Filter>Algorithm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="VEFM">
