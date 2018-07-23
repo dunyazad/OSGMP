@@ -10,7 +10,7 @@ namespace VEFM
 	public:
 		inline T& GetPosition() { return m_position; }
 		//inline const V3& GetPosition() const { return m_position; }
-		inline const T& P() const { return m_position; }
+		inline T& P() { return m_position; }
 
 		inline void AddEdgeReference(Edge<T>* pEdge) { if(IsDeleteQueried() == false) m_incidentEdges.insert(pEdge); }
 		inline void RemoveEdgeReference(Edge<T>* pEdge) { if (IsDeleteQueried() == false) { m_incidentEdges.erase(pEdge); if (m_incidentEdges.size() == 0) QueryDelete(); } }

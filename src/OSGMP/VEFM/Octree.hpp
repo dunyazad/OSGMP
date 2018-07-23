@@ -306,7 +306,8 @@ namespace VEFM
 				}
 				else
 				{
-					if ((pV->P() - position).length() < EPSILON)
+					//if ((pV->P() - position).length() < EPSILON)
+					if ((pV->P() - position).length() < 0.00001f)
 					{
 						return pV;
 					}

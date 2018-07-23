@@ -61,14 +61,17 @@ public:
 	void ToggleVisible();
 	void ToggleVisible(const string& name);
 
-	bool CheckIntersection(const string& nameA, const string& nameB, map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>& result);
+	bool CheckIntersection(const string& nameA, const string& nameB, map<tuple<Mesh<T>*, Face<T>*>, set<T>>& result);
 	bool CheckIntersections(const string& baseName, const vector<string>& names, map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>& result);
 	
-	void SplitFaces(const map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>& input);
+	void SplitFaces(const map<tuple<Mesh<T>*, Face<T>*>, set<T>>& input);
 
 	void Triangulate(const T& fv0, const T& fv1, const T& fv2, const vector<T>& points, vector<tuple<T, T, T>>& result);
 
-	void ProjectToPlane(const T& planePosition, const T& planeNormal, const vector<T>& inputPoints, vector<T>& projectedPoints);
+	void ProjectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const T& inputPoint, T& projectedPoint);
+	void ProjectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const vector<T>& inputPoints, vector<T>& projectedPoints);
+	void ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, T& inputPoint, T& projectedPoint);
+	void ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, const vector<T>& inputPoints, vector<T>& projectedPoints);
 
 	inline void SetVD(PrimitiveRendererVEFM<T>* pVD) { m_pVD = pVD; }
 

@@ -12,7 +12,7 @@ ref_ptr<Group> g_pRootNode;
 
 StopWatch g_stopWatch;
 
-map<tuple<Mesh<Vec3>*, Face<Vec3>*>, set<pair<Vec3, Vec3>>> g_result;
+map<tuple<Mesh<Vec3>*, Face<Vec3>*>, set<Vec3>> g_result;
 int g_count = 0;
 
 set<Edge<Vec3>*> g_visitedEdges;
@@ -98,6 +98,8 @@ public:
 			case 'f':
 				printf("F\n");
 				{
+					printf("================================================================================\n");
+
 					auto pMesh = g_pMP->GetMesh("Mx");
 					//auto pE = pMesh->FindFirstMetBorderEdge();
 					//if (pE != nullptr)
@@ -119,6 +121,10 @@ public:
 								pvd->AddBox(pF->V0()->P(), 0.01f, 0.01f, 0.01f, V4_RED, true);
 								pvd->AddBox(pF->V1()->P(), 0.008f, 0.008f, 0.008f, V4_GREEN, true);
 								pvd->AddBox(pF->V2()->P(), 0.004f, 0.004f, 0.004f, V4_BLUE, true);
+
+								printf("%f, %f, %f\n", pF->V0()->P().x(), pF->V0()->P().y(), pF->V0()->P().z());
+								printf("%f, %f, %f\n", pF->V1()->P().x(), pF->V1()->P().y(), pF->V1()->P().z());
+								printf("%f, %f, %f\n", pF->V2()->P().x(), pF->V2()->P().y(), pF->V2()->P().z());
 							}
 							break;
 						}
@@ -163,24 +169,6 @@ public:
 			case 'x':
 				printf("X\n");
 				{
-					int cnt = -1;
-					for (auto& kvp : g_result)
-					{
-						cnt++;
-						if (cnt == g_count)
-						{
-							g_count++;
-
-							pvd->AddTriangleByFace(get<1>(kvp.first), V4_RED, true);
-							for (auto& vv : kvp.second)
-							{
-								pvd->AddLine(vv.first, vv.second, V4_GREEN, V4_GREEN);
-							}
-
-							
-							break;
-						}
-					}
 				}
 				return false;
 
@@ -575,8 +563,14 @@ int main(int argc, char** argv)
 	g_pMP = &mp;
 	g_pMP->SetVD(pvd);
 
-	mp.LoadABDFile("Mx", "../../res/MxBone.abd");
-	mp.LoadABDFile("MxTeeth", "../../res/MxTeeth.abd");
+	
+	
+#pragma region Model Intersection
+	//mp.LoadABDFile("Mx", "../../res/MxBone.abd");
+	//mp.LoadABDFile("MxTeeth", "../../res/MxTeeth.abd");
+#pragma endregion
+
+
 
 	//Vec3 fv0(0, 0, -400);
 	//Vec3 fv1(250, 0, 0);
@@ -636,8 +630,19 @@ int main(int argc, char** argv)
 
 
 
-	//mp.LoadABDFile("Mx", "../../res/random plane.abd");
-	//auto pMesh = mp.GetMesh("Mx");
+	mp.LoadABDFile("Mx", "../../res/random plane.abd");
+	auto pMesh = mp.GetMesh("Mx");
+	
+	set<Vertex<Vec3>*> vertices;
+	pMesh->GetVertices(vertices);
+
+	vector<Vec3> positions;
+	for (auto& pV : vertices)
+	{
+		g_pMP->ProjectToPlane(Vec3(0, 0, 10), Vec3(0, -1, -1), pV->P(), pV->P());
+	}
+
+	
 
 	//auto pMD = mp.GetOrCreateMesh("Md");
 
@@ -660,7 +665,9 @@ int main(int argc, char** argv)
 	//	pMD->GetOrCreateFace(np0, np1, np2);
 	//}
 
-	//mp.UpdateModel();
+	mp.UpdateModel();
+
+
 
 	return viewer.run();
 }

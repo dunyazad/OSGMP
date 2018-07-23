@@ -981,7 +981,7 @@ void OSGMP<T>::ToggleVisible(const string& name)
 }
 
 template<typename T>
-bool OSGMP<T>::CheckIntersection(const string& nameA, const string& nameB, map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>& result)
+bool OSGMP<T>::CheckIntersection(const string& nameA, const string& nameB, map<tuple<Mesh<T>*, Face<T>*>, set<T>>& result)
 {
 	auto pMeshA = GetMesh(nameA);
 	auto pMeshB = GetMesh(nameB);
@@ -1063,14 +1063,17 @@ bool OSGMP<T>::CheckIntersection(const string& nameA, const string& nameB, map<t
 					tuple<Mesh<T>*, Face<T>*> keyB(pMeshB, pFB);
 					if (result.count(keyA) == 0)
 					{
-						result[keyA] = set<pair<T, T>>();
+						result[keyA] = set<T>();
 					}
 					if (result.count(keyB) == 0)
 					{
-						result[keyB] = set<pair<T, T>>();
+						result[keyB] = set<T>();
 					}
-					result[keyA].insert(make_pair(A, B));
-					result[keyB].insert(make_pair(A, B));
+					result[keyA].insert(A);
+					result[keyA].insert(B);
+
+					result[keyB].insert(A);
+					result[keyB].insert(B);
 				}
 			}
 		}
@@ -1194,13 +1197,8 @@ bool OSGMP<T>::CheckIntersections(const string& baseName, const vector<string>& 
 	else return false;
 }
 
-void Triangluate(const Vec3& fv0, const Vec3& fv1, const Vec3& fv2, const vector<Vec3>& points, vector<tuple<Vec3, Vec3, Vec3>>& result)
-{
-
-}
-
 template<typename T>
-void OSGMP<T>::SplitFaces(const map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>& input)
+void OSGMP<T>::SplitFaces(const map<tuple<Mesh<T>*, Face<T>*>, set<T>>& input)
 {
 	for (auto& kvp : input)
 	{
@@ -1215,16 +1213,7 @@ void OSGMP<T>::SplitFaces(const map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>&
 
 		pF->QueryDelete();
 
-		set<Vec3> vertices;
-		for (auto& vv : kvp.second)
-		{
-			if (fv0 != vv.first && fv1 != vv.first && fv2 != vv.first)
-				vertices.insert(vv.first);
-			if (fv0 != vv.second && fv1 != vv.second && fv2 != vv.second)
-				vertices.insert(vv.second);
-		}
-
-		vector<Vec3> points(vertices.begin(), vertices.end());
+		vector<Vec3> points(kvp.second.begin(), kvp.second.end());
 		
 		//vector<pair<T, T>> input;
 		//for (auto& vv : kvp.second)
@@ -1261,7 +1250,7 @@ void OSGMP<T>::SplitFaces(const map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>&
 			{
 				auto d01 = v1 - v0;
 				auto d02 = v2 - v0;
-				if (d01 * d02 > EPSILON)
+				if (fabsf(d01 * d02) > 0.00001f)
 				{
 					pMesh->GetOrCreateFace(v0, v1, v2);
 				}
@@ -1273,14 +1262,14 @@ void OSGMP<T>::SplitFaces(const map<tuple<Mesh<T>*, Face<T>*>, set<pair<T, T>>>&
 			//}
 		}
 
-		for (auto& vv : kvp.second)
-		{
-			auto pE = pMesh->GetEdge(vv.first, vv.second);
-			if (pE)
-			{
-				pE->SetFlag("IntersectionBorder", true);
-			}
-		}
+		//for (auto& vv : kvp.second)
+		//{
+		//	auto pE = pMesh->GetEdge(vv.first, vv.second);
+		//	if (pE)
+		//	{
+		//		pE->SetFlag("IntersectionBorder", true);
+		//	}
+		//}
 	}
 }
 
@@ -1385,12 +1374,18 @@ void OSGMP<T>::Triangulate(const T& fv0, const T& fv1, const T& fv2, const vecto
 }
 
 template<typename T>
-void OSGMP<T>::ProjectToPlane(const T& planePosition, const T& planeNormal, const vector<T>& inputPoints, vector<T>& projectedPoints)
+void OSGMP<T>::ProjectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const T& inputPoint, T& projectedPoint)
+{
+	IntersectRayPlane<T>(inputPoint, -projectionPlaneNormal, projectionPlanePosition, projectionPlaneNormal, projectedPoint);
+}
+
+template<typename T>
+void OSGMP<T>::ProjectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const vector<T>& inputPoints, vector<T>& projectedPoints)
 {
 	for (auto& ip : inputPoints)
 	{
 		T rp;
-		if (IntersectRayPlane<T>(ip, -planeNormal, planePosition, planeNormal, rp))
+		if (IntersectRayPlane<T>(ip, -projectionPlaneNormal, projectionPlanePosition, projectionPlaneNormal, rp))
 		{
 			projectedPoints.push_back(rp);
 		}
@@ -1398,6 +1393,46 @@ void OSGMP<T>::ProjectToPlane(const T& planePosition, const T& planeNormal, cons
 		{
 			projectedPoints.push_back(ip);
 		}
+	}
+}
+
+template<typename T>
+void OSGMP<T>::ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, T& inputPoint, T& projectedPoint)
+{
+	float x = projectionPlaneNormal.x();
+	float y = projectionPlaneNormal.y();
+	float z = projectionPlaneNormal.z();
+	if (x > y && x > z)
+	{
+		ProjectToPlane(projectionPlanePosition, T(1, 0, 0), inputPoint, projectedPoint);
+	}
+	else if (y > x && y > z)
+	{
+		ProjectToPlane(projectionPlanePosition, T(0, 1, 0), inputPoint, projectedPoint);
+	}
+	else if (z > x && z > y)
+	{
+		ProjectToPlane(projectionPlanePosition, T(0, 0, 1), inputPoint, projectedPoint);
+	}
+}
+
+template<typename T>
+void OSGMP<T>::ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, const vector<T>& inputPoints, vector<T>& projectedPoints)
+{
+	float x = projectionPlaneNormal.x();
+	float y = projectionPlaneNormal.y();
+	float z = projectionPlaneNormal.z();
+	if (x > y && x > z)
+	{
+		ProjectToPlane(projectionPlanePosition, T(1, 0, 0), inputPoints, projectedPoints);
+	}
+	else if (y > x && y > z)
+	{
+		ProjectToPlane(projectionPlanePosition, T(0, 1, 0), inputPoints, projectedPoints);
+	}
+	else if (z > x && z > y)
+	{
+		ProjectToPlane(projectionPlanePosition, T(0, 0, 1), inputPoints, projectedPoints);
 	}
 }
 
