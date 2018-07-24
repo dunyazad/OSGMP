@@ -38,14 +38,56 @@ namespace VEFM
 			}
 		}
 
+		void AddChild(TreeNode<T>* pChildNode)
+		{
+			auto pParent = pChildNode->GetParent();
+
+			if (pParent != nullptr)
+			{
+				auto& ci = pParent->m_children.begin();
+				while (ci != pParent->m_children.end())
+				{
+					if ((*ci) == pChildNode)
+					{
+						ci = pParent->m_children.erase(ci);
+					}
+					else
+					{
+						ci++;
+					}
+				}
+			}
+			pChildNode->m_pParent = this;
+			m_children.push_back(pChildNode);
+		}
+
+		void RemoveChild(TreeNode<T>* pChildNode)
+		{
+			auto& ci = m_children.begin();
+			while (ci != m_children.end())
+			{
+				if ((*ci) == pChildNode)
+				{
+					ci = m_children.erase(ci);
+				}
+				else
+				{
+					ci++;
+				}
+			}
+
+			pChildNode->m_pParent = nullptr;
+		}
+
 	protected:
+		Tree<T>* m_pTree = nullptr;
 		TreeNode<T>* m_pParent = nullptr;
 		vector<TreeNode<T>*> m_children;
 		string m_name;
 		vector<T> m_elements;
 
-		TreeNode(TreeNode<T>* pParent, const string& name)
-			: m_pParent(pParent), m_name(name)
+		TreeNode(Tree<T>* pTree, TreeNode<T>* pParent, const string& name)
+			: m_pTree(pTree), m_pParent(pParent), m_name(name)
 		{
 		}
 
@@ -71,7 +113,7 @@ namespace VEFM
 	public:
 		Tree()
 		{
-			m_pRootNode = new TreeNode<T>(nullptr, "0");
+			m_pRootNode = new TreeNode<T>(this, nullptr, "0");
 		}
 
 		~Tree()
@@ -101,7 +143,7 @@ namespace VEFM
 				nodeName = buffer;
 			}
 
-			auto pNode = new TreeNode<T>(pParent, nodeName);
+			auto pNode = new TreeNode<T>(this, pParent, nodeName);
 			pParent->m_children.push_back(pNode);
 
 			return pNode;

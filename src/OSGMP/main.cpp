@@ -496,23 +496,114 @@ void DrawVolumeInfo(const Octree<Vertex<Vec3>, Vec3>* pVolumeInfo)
 //	}
 //}
 
-void PopulateTree(Tree<int>& tree, TreeNode<int>* pParentNode, const vector<int>& indices, int from, int to)
+namespace VEFM
 {
-	if (to - from > 2)
+
+	template<typename T>
+	class TriangleTreeNode : public TreeNode<T>
 	{
-		TreeNode<int>* pLeftChild = tree.CreateNode(pParentNode);
-		PopulateTree(tree, pLeftChild, indices, from, from + (int)((to - from) * 0.5f));
-		TreeNode<int>* pRightChild = tree.CreateNode(pParentNode);
-		PopulateTree(tree, pRightChild, indices, from + (int)((to - from) * 0.5f) + 1, to);
-	}
-	else
-	{
-		for (int i = from; i <= to; i++)
+	public:
+		TriangleTreeNode(Tree<T>* pTree, TreeNode<T>* pParent, const string& name)
+			: TreeNode<T>(pTree, pParent, name)
 		{
-			pParentNode->GetElements().push_back(i);
+
+		}
+
+		void Populate(const vector<int>& indices, int from, int to)
+		{
+			if (to - from > 2)
+			{
+				TreeNode<int>* pLeftChild = m_pTree->CreateNode(this);
+				((TriangleTreeNode<T>*)pLeftChild)->Populate(indices, from, from + (int)((to - from) * 0.5f));
+				TreeNode<int>* pRightChild = m_pTree->CreateNode(this);
+				((TriangleTreeNode<T>*)pRightChild)->Populate(indices, from + (int)((to - from) * 0.5f) + 1, to);
+			}
+			else
+			{
+				for (int i = from; i <= to; i++)
+				{
+					m_elements.push_back(i);
+				}
+			}
+		}
+
+		void MergeChild(const vector<Vec3> vertices, const vector<int>& indices)
+		{
+			auto& ci = m_children.begin();
+			while (ci != m_children.end())
+			{
+				TriangleTreeNode<T>* pChild = (TriangleTreeNode<T>*)*ci;
+
+				pChild->MergeChild(vertices, indices);
+
+				if (pChild->GetChildren().size() == 0)
+				{
+					for (auto& v : pChild->GetElements())
+					{
+						m_elements.push_back(v);
+					}
+
+					delete pChild;
+					ci = m_children.erase(ci);
+				}
+				else
+				{
+					ci++;
+				}
+			}
+		}
+
+	protected:
+		vector<tuple<int, int, int>> triangleIndices;
+	};
+
+	template<typename T>
+	class TriangleTree : public Tree<T>
+	{
+	public:
+		TriangleTree()
+			: Tree()
+		{
+			if (m_pRootNode != nullptr)
+			{
+				m_pRootNode = new TriangleTreeNode<T>(this, nullptr, "0");
+			}
+		}
+
+		void Populate(const vector<int>& indices, int from, int to)
+		{
+			((TriangleTreeNode<T>*)m_pRootNode)->Populate(indices, from, to);
+		}
+
+		void MergeChildNodes(const vector<Vec3> vertices, const vector<int>& indices)
+		{
+			((TriangleTreeNode<T>*)m_pRootNode)->MergeChild(vertices, indices);
+		}
+	};
+}
+
+void MergeChild(TreeNode<int>* pNode, const vector<Vec3> vertices, const vector<int>& indices)
+{
+	auto& children = pNode->GetChildren();
+
+	for (auto& pChild : children)
+	{
+		MergeChild(pChild, vertices, indices);
+	}
+
+	if (children.size() == 0)
+	{
+		auto pParent = pNode->GetParent();
+		if (pParent != nullptr)
+		{
+			for (auto& v : pNode->GetElements())
+			{
+				pParent->GetElements().push_back(v);
+			}
+			pParent->RemoveChild(pNode);
 		}
 	}
-};
+}
 
 void PrintNode(TreeNode<int>* pNode)
 {
@@ -572,75 +663,85 @@ int main(int argc, char** argv)
 
 
 
-	//Vec3 fv0(0, 0, -400);
-	//Vec3 fv1(250, 0, 0);
-	//Vec3 fv2(500, 0, -400);
-	//pvd->AddTriangle(fv0, fv1, fv2, Vec4(GREEN, 0.3), true);
+	Vec3 fv0(0, 0, -400);
+	Vec3 fv1(250, 0, 0);
+	Vec3 fv2(500, 0, -400);
+	pvd->AddTriangle(fv0, fv1, fv2, Vec4(GREEN, 0.3), true);
 
-	//vector<Vec3> vertices;
-	//vertices.push_back(fv0);
-	//vertices.push_back(fv1);
-	//vertices.push_back(fv2);
-	//vertices.push_back(Vec3(110, 0, -260));
-	//vertices.push_back(Vec3(120, 0, -330));
-	//vertices.push_back(Vec3(190, 0, -120));
-	//vertices.push_back(Vec3(230, 0, -180));
-	//vertices.push_back(Vec3(170, 0, -230));
-	//vertices.push_back(Vec3(200, 0, -250));
-	//vertices.push_back(Vec3(150, 0, -310));
-	//vertices.push_back(Vec3(230, 0, -300));
-	//vertices.push_back(Vec3(230, 0, -210));
-	//vertices.push_back(Vec3(270, 0, -190));
-	//vertices.push_back(Vec3(240, 0, -130));
-	//vertices.push_back(Vec3(230, 0, -70));
-	//vertices.push_back(Vec3(280, 0, -100));
-	//vertices.push_back(Vec3(310, 0, -210));
-	//vertices.push_back(Vec3(240, 0, -250));
-	//vertices.push_back(Vec3(270, 0, -270));
-	//vertices.push_back(Vec3(290, 0, -230));
-	//vertices.push_back(Vec3(330, 0, -240));
-	//vertices.push_back(Vec3(340, 0, -270));
-	//vertices.push_back(Vec3(320, 0, -320));
-	//vertices.push_back(Vec3(130, 0, -360));
-	//vertices.push_back(Vec3(390, 0, -380));
-	//vertices.push_back(Vec3(270, 0, -350));
-	//vertices.push_back(Vec3(380, 0, -330));
-	//vertices.push_back(Vec3(360, 0, -220));
+	vector<Vec3> vertices;
+	vertices.push_back(fv0);
+	vertices.push_back(fv1);
+	vertices.push_back(fv2);
+	vertices.push_back(Vec3(110, 0, -260));
+	vertices.push_back(Vec3(120, 0, -330));
+	vertices.push_back(Vec3(190, 0, -120));
+	vertices.push_back(Vec3(230, 0, -180));
+	vertices.push_back(Vec3(170, 0, -230));
+	vertices.push_back(Vec3(200, 0, -250));
+	vertices.push_back(Vec3(150, 0, -310));
+	vertices.push_back(Vec3(230, 0, -300));
+	vertices.push_back(Vec3(230, 0, -210));
+	vertices.push_back(Vec3(270, 0, -190));
+	vertices.push_back(Vec3(240, 0, -130));
+	vertices.push_back(Vec3(230, 0, -70));
+	vertices.push_back(Vec3(280, 0, -100));
+	vertices.push_back(Vec3(310, 0, -210));
+	vertices.push_back(Vec3(240, 0, -250));
+	vertices.push_back(Vec3(270, 0, -270));
+	vertices.push_back(Vec3(290, 0, -230));
+	vertices.push_back(Vec3(330, 0, -240));
+	vertices.push_back(Vec3(340, 0, -270));
+	vertices.push_back(Vec3(320, 0, -320));
+	vertices.push_back(Vec3(130, 0, -360));
+	vertices.push_back(Vec3(390, 0, -380));
+	vertices.push_back(Vec3(270, 0, -350));
+	vertices.push_back(Vec3(380, 0, -330));
+	vertices.push_back(Vec3(360, 0, -220));
 
-	//sort(vertices.begin(), vertices.end());
+	sort(vertices.begin(), vertices.end());
 
-	//vector<int> indices;
-	//for (int i = 0; i < vertices.size(); i++)
-	//{
-	//	indices.push_back(i);
-	//}
-	//
+	vector<int> indices;
+	for (unsigned int i = 0; i < vertices.size(); i++)
+	{
+		indices.push_back(i);
+	}
+	
 
-	//Tree<int> tree;
-	//PopulateTree(tree, tree.GetRootNode(), indices, 0, indices.size() - 1);
+	//TriangleTree<int> tree;
+	//tree.Populate(indices, 0, indices.size() - 1);
+
+	//tree.MergeChildNodes(vertices, indices);
 
 	//PrintNode(tree.GetRootNode());
 
 
+	vector<tuple<Vec3, Vec3, Vec3>> result;
+	g_pMP->Triangulate(fv0, fv1, fv2, vertices, result);
 
 
 
-
-
-
-
-
-	mp.LoadABDFile("Mx", "../../res/random plane.abd");
-	auto pMesh = mp.GetMesh("Mx");
-	
-	set<Vertex<Vec3>*> vertices;
-	pMesh->GetVertices(vertices);
-
-	vector<Vec3> positions;
-	for (auto& pV : vertices)
+	for (auto& vvv : result)
 	{
-		g_pMP->ProjectToPlane(Vec3(0, 0, 10), Vec3(0, -1, -1), pV->P(), pV->P());
+		pvd->AddTriangle(get<0>(vvv), get<1>(vvv), get<2>(vvv), V4_WHITE, false);
 	}
+
+
+
+
+#pragma region Projection Test
+	//mp.LoadABDFile("Mx", "../../res/random plane.abd");
+	//auto pMesh = mp.GetMesh("Mx");
+
+	//set<Vertex<Vec3>*> vertices;
+	//pMesh->GetVertices(vertices);
+
+	//vector<Vec3> positions;
+	//for (auto& pV : vertices)
+	//{
+	//	g_pMP->ProjectToPlane(Vec3(0, 0, 10), Vec3(0, -1, -1), pV->P(), pV->P());
+	//}
+#pragma endregion
+
 
 	
 

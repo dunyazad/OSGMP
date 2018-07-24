@@ -1340,12 +1340,20 @@ void OSGMP<T>::Triangulate(const T& fv0, const T& fv1, const T& fv2, const vecto
 
 	vector<T> projected;
 
-	ProjectToPlane(center, normal, points, projected);
+	ProjectToAxis(center, normal, points, projected);
+
+	T pfv0;
+	T pfv1;
+	T pfv2;
+
+	ProjectToAxis(center, normal, fv0, pfv0);
+	ProjectToAxis(center, normal, fv1, pfv1);
+	ProjectToAxis(center, normal, fv2, pfv2);
 
 	ref_ptr<Vec3Array> pVertices = new Vec3Array(projected.begin(), projected.end());
-	pVertices->push_back(fv0);
-	pVertices->push_back(fv1);
-	pVertices->push_back(fv2);
+	pVertices->push_back(pfv0);
+	pVertices->push_back(pfv1);
+	pVertices->push_back(pfv2);
 	
 	ref_ptr<osgUtil::DelaunayTriangulator> pDT = new osgUtil::DelaunayTriangulator;
 	pDT->setInputPointArray(pVertices);
@@ -1397,7 +1405,7 @@ void OSGMP<T>::ProjectToPlane(const T& projectionPlanePosition, const T& project
 }
 
 template<typename T>
-void OSGMP<T>::ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, T& inputPoint, T& projectedPoint)
+void OSGMP<T>::ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, const T& inputPoint, T& projectedPoint)
 {
 	float x = projectionPlaneNormal.x();
 	float y = projectionPlaneNormal.y();
