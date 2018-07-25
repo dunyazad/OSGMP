@@ -16,7 +16,9 @@ namespace VEFM
 		inline TreeNode<T>* GetChild(int index) { if(index > m_children.size() - 1) return nullptr else return m_children; }
 		inline vector<TreeNode<T>*>& GetChildren() { return m_children; }
 
-		vector<T>& GetElements() { return m_elements; }
+		inline bool IsLeaf() { return m_children.size() == 0; }
+
+		inline vector<T>& GetElements() { return m_elements; }
 
 		TreeNode<T>* FindNode(const string& name)
 		{
@@ -181,4 +183,173 @@ namespace VEFM
 		int m_nodeCount = 0;
 	};
 
+	//===========================================================================================================//
+
+	template<typename T> class BinaryTreeNode;
+	template<typename T> class BinaryTree;
+
+	template<typename T>
+	class BinaryTreeNode
+	{
+	public:
+		inline const string& GetName() const { return m_name; }
+		inline BinaryTreeNode<T>* GetParent() { return m_pParent; }
+		inline BinaryTreeNode<T>* GetLeftChild() { return m_pLeftChild; }
+		inline BinaryTreeNode<T>* GetRightChild() { return m_pRightChild; }
+		inline vector<T>& GetElements() { return m_elements; }
+
+		inline bool IsLeaf() { return (m_pLeftChild == nullptr) && (m_pRightChild == nullptr); }
+
+		void AddLeftChild(BinaryTreeNode<T>* pLeftChild)
+		{
+			if (pLeftChild->m_pParent != nullptr)
+			{
+				if (pLeftChild == pLeftChild->m_pParent->m_pLeftChild)
+				{
+					pLeftChild->m_pParent->m_pLeftChild = nullptr;
+				}
+				if (pLeftChild == pLeftChild->m_pParent->m_pRightChild)
+				{
+					pLeftChild->m_pParent->m_pRightChild = nullptr;
+				}
+			}
+			pLeftChild->m_pParent = this;
+
+			if (m_pLeftChild != nullptr)
+			{
+				m_pLeftChild->m_pParent = nullptr;
+			}
+			m_pLeftChild = pLeftChild;
+		}
+
+		void AddRightChild(BinaryTreeNode<T>* pRightChild)
+		{
+			if (pRightChild->m_pParent != nullptr)
+			{
+				if (pRightChild == pRightChild->m_pParent->m_pLeftChild)
+				{
+					pRightChild->m_pParent->m_pLeftChild = nullptr;
+				}
+				if (pRightChild == pRightChild->m_pParent->m_pRightChild)
+				{
+					pRightChild->m_pParent->m_pRightChild = nullptr;
+				}
+			}
+			pRightChild->m_pParent = this;
+
+			if (m_pRightChild != nullptr)
+			{
+				m_pRightChild->m_pParent = nullptr;
+			}
+			m_pRightChild = pRightChild;
+		}
+
+		void RemoveLeftChild()
+		{
+			auto pLeftChild = m_pLeftChild;
+			if (m_pLeftChild != nullptr)
+			{
+				m_pLeftChild->m_pParent = nullptr;
+			}
+			m_pLeftChild = nullptr;
+			delete pLeftChild;
+		}
+
+		void RemoveRightChild()
+		{
+			auto pRightChild = m_pRightChild;
+			if (m_pRightChild != nullptr)
+			{
+				m_pRightChild->m_pParent = nullptr;
+			}
+			m_pRightChild = nullptr;
+			delete pRightChild;
+		}
+
+	protected:
+		BinaryTree<T>* m_pTree = nullptr;
+		BinaryTreeNode<T>* m_pParent = nullptr;
+		BinaryTreeNode<T>* m_pLeftChild = nullptr;
+		BinaryTreeNode<T>* m_pRightChild = nullptr;
+
+		string m_name;
+		vector<T> m_elements;
+
+		BinaryTreeNode(BinaryTree<T>* pTree, BinaryTreeNode<T>* pParent, const string& name)
+			: m_pTree(pTree), m_pParent(pParent), m_name(name)
+		{
+		}
+
+		~BinaryTreeNode()
+		{
+			if (m_pLeftChild != nullptr)
+			{
+				delete m_pLeftChild;
+				m_pLeftChild = nullptr;
+			}
+
+			if (m_pRightChild != nullptr)
+			{
+				delete m_pRightChild;
+				m_pRightChild = nullptr;
+			}
+		}
+
+		public:
+			friend class BinaryTree<T>;
+	};
+
+	template<typename T>
+	class BinaryTree
+	{
+	public:
+		BinaryTree()
+		{
+			m_pRootNode = new BinaryTreeNode<T>(this, nullptr, "0");
+		}
+
+		~BinaryTree()
+		{
+			if (m_pRootNode != nullptr)
+			{
+				delete m_pRootNode;
+				m_pRootNode = nullptr;
+			}
+		}
+
+		inline BinaryTreeNode<T>* GetRootNode() { return m_pRootNode; }
+
+		BinaryTreeNode<T>* CreateNode(BinaryTreeNode<T>* pParent, bool bLeftChild, const string& name = "")
+		{
+			if (pParent == nullptr)
+			{
+				return nullptr;
+			}
+
+			string nodeName(name);
+			if (nodeName.empty())
+			{
+				char buffer[32];
+				memset(buffer, 0, 32);
+				itoa(m_nodeCount++, buffer, 10);
+				nodeName = buffer;
+			}
+
+			auto pNode = new BinaryTreeNode<T>(this, pParent, nodeName);
+			if (bLeftChild)
+			{
+				pParent->AddLeftChild(pNode);
+			}
+			else
+			{
+				pParent->AddRightChild(pNode);
+			}
+
+			return pNode;
+		}
+
+	protected:
+		BinaryTreeNode<T>* m_pRootNode = nullptr;
+		int m_nodeCount = 0;
+	};
 }

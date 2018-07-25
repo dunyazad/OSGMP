@@ -499,23 +499,20 @@ void DrawVolumeInfo(const Octree<Vertex<Vec3>, Vec3>* pVolumeInfo)
 namespace VEFM
 {
 
+	template<typename T> class TriangleTreeNode;
+	template<typename T> class TriangleTree;
+
 	template<typename T>
-	class TriangleTreeNode : public TreeNode<T>
+	class TriangleTreeNode : public BinaryTreeNode<T>
 	{
 	public:
-		TriangleTreeNode(Tree<T>* pTree, TreeNode<T>* pParent, const string& name)
-			: TreeNode<T>(pTree, pParent, name)
-		{
-
-		}
-
 		void Populate(const vector<int>& indices, int from, int to)
 		{
 			if (to - from > 2)
 			{
-				TreeNode<int>* pLeftChild = m_pTree->CreateNode(this);
+				BinaryTreeNode<int>* pLeftChild = m_pTree->CreateNode(this, true);
 				((TriangleTreeNode<T>*)pLeftChild)->Populate(indices, from, from + (int)((to - from) * 0.5f));
-				TreeNode<int>* pRightChild = m_pTree->CreateNode(this);
+				BinaryTreeNode<int>* pRightChild = m_pTree->CreateNode(this, false);
 				((TriangleTreeNode<T>*)pRightChild)->Populate(indices, from + (int)((to - from) * 0.5f) + 1, to);
 			}
 			else
@@ -529,40 +526,56 @@ namespace VEFM
 
 		void MergeChild(const vector<Vec3> vertices, const vector<int>& indices)
 		{
-			auto& ci = m_children.begin();
-			while (ci != m_children.end())
+			if (m_pLeftChild != nullptr)
 			{
-				TriangleTreeNode<T>* pChild = (TriangleTreeNode<T>*)*ci;
-
-				pChild->MergeChild(vertices, indices);
-
-				if (pChild->GetChildren().size() == 0)
+				((TriangleTreeNode<T>*)m_pLeftChild)->MergeChild(vertices, indices);
+			
+				if (m_pLeftChild->IsLeaf())
 				{
-					for (auto& v : pChild->GetElements())
+					for (auto& v : m_pLeftChild->GetElements())
 					{
 						m_elements.push_back(v);
 					}
 
-					delete pChild;
-					ci = m_children.erase(ci);
+					RemoveLeftChild();
 				}
-				else
+			}
+
+			if (m_pRightChild != nullptr)
+			{
+				((TriangleTreeNode<T>*)m_pRightChild)->MergeChild(vertices, indices);
+
+				if (m_pRightChild->IsLeaf())
 				{
-					ci++;
+					for (auto& v : m_pRightChild->GetElements())
+					{
+						m_elements.push_back(v);
+					}
+
+					RemoveRightChild();
 				}
 			}
 		}
 
 	protected:
 		vector<tuple<int, int, int>> triangleIndices;
+
+		TriangleTreeNode(BinaryTree<T>* pTree, BinaryTreeNode<T>* pParent, const string& name)
+			: BinaryTreeNode<T>(pTree, pParent, name)
+		{
+
+		}
+
+	public:
+		friend class TriangleTree<T>;
 	};
 
 	template<typename T>
-	class TriangleTree : public Tree<T>
+	class TriangleTree : public BinaryTree<T>
 	{
 	public:
 		TriangleTree()
-			: Tree()
+			: BinaryTree()
 		{
 			if (m_pRootNode != nullptr)
 			{
@@ -582,29 +595,6 @@ namespace VEFM
 	};
 }
 
-void MergeChild(TreeNode<int>* pNode, const vector<Vec3> vertices, const vector<int>& indices)
-{
-	auto& children = pNode->GetChildren();
-
-	for (auto& pChild : children)
-	{
-		MergeChild(pChild, vertices, indices);
-	}
-
-	if (children.size() == 0)
-	{
-		auto pParent = pNode->GetParent();
-		if (pParent != nullptr)
-		{
-			for (auto& v : pNode->GetElements())
-			{
-				pParent->GetElements().push_back(v);
-			}
-			pParent->RemoveChild(pNode);
-		}
-	}
-}
-
 void PrintNode(TreeNode<int>* pNode)
 {
 	if (pNode->GetChildren().size() > 0)
@@ -613,6 +603,32 @@ void PrintNode(TreeNode<int>* pNode)
 		{
 			PrintNode(pC);
 		}
+	}
+	//else
+	{
+		if (pNode->GetElements().size() > 0)
+		{
+			printf("Node Name : %s\n", pNode->GetName().c_str());
+			for (auto& i : pNode->GetElements())
+			{
+				printf("%d\n", i);
+			}
+		}
+	}
+}
+
+void PrintNode(BinaryTreeNode<int>* pNode)
+{
+	auto pLeftChild = pNode->GetLeftChild();
+	if (pLeftChild != nullptr)
+	{
+		PrintNode(pLeftChild);
+	}
+
+	auto pRightChild = pNode->GetRightChild();
+	if (pRightChild != nullptr)
+	{
+		PrintNode(pRightChild);
 	}
 	//else
 	{
@@ -707,25 +723,12 @@ int main(int argc, char** argv)
 	}
 	
 
-	//TriangleTree<int> tree;
-	//tree.Populate(indices, 0, indices.size() - 1);
+	TriangleTree<int> tree;
+	tree.Populate(indices, 0, indices.size() - 1);
 
-	//tree.MergeChildNodes(vertices, indices);
+	tree.MergeChildNodes(vertices, indices);
 
-	//PrintNode(tree.GetRootNode());
-
-
-	vector<tuple<Vec3, Vec3, Vec3>> result;
-	g_pMP->Triangulate(fv0, fv1, fv2, vertices, result);
-
-
-
-	for (auto& vvv : result)
-	{
-		pvd->AddTriangle(get<0>(vvv), get<1>(vvv), get<2>(vvv), V4_WHITE, false);
-	}
-
-
+	PrintNode(tree.GetRootNode());
 
 
 #pragma region Projection Test

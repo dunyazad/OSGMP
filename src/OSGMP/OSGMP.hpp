@@ -1355,30 +1355,30 @@ void OSGMP<T>::Triangulate(const T& fv0, const T& fv1, const T& fv2, const vecto
 	pVertices->push_back(pfv1);
 	pVertices->push_back(pfv2);
 	
-	ref_ptr<osgUtil::DelaunayTriangulator> pDT = new osgUtil::DelaunayTriangulator;
-	pDT->setInputPointArray(pVertices);
-	pDT->triangulate();
+	//ref_ptr<osgUtil::DelaunayTriangulator> pDT = new osgUtil::DelaunayTriangulator;
+	//pDT->setInputPointArray(pVertices);
+	//pDT->triangulate();
 
-	auto pTriangles = pDT->getTriangles();
-	for (unsigned int i = 0; i < pTriangles->size() / 3; i++)
-	{
-		auto& v0 = pVertices->at(pDT->getTriangles()->at(i * 3 + 0));
-		auto& v1 = pVertices->at(pDT->getTriangles()->at(i * 3 + 1));
-		auto& v2 = pVertices->at(pDT->getTriangles()->at(i * 3 + 2));
+	//auto pTriangles = pDT->getTriangles();
+	//for (unsigned int i = 0; i < pTriangles->size() / 3; i++)
+	//{
+	//	auto& v0 = pVertices->at(pDT->getTriangles()->at(i * 3 + 0));
+	//	auto& v1 = pVertices->at(pDT->getTriangles()->at(i * 3 + 1));
+	//	auto& v2 = pVertices->at(pDT->getTriangles()->at(i * 3 + 2));
 
-		auto vd01 = v1 - v0;
-		auto vd02 = v2 - v0;
-		auto vnormal = vd01 ^ vd02;
-		vnormal.normalize();
-		if (normal * vnormal < 0)
-		{
-			result.push_back(make_tuple(v0, v2, v1));
-		}
-		else
-		{
-			result.push_back(make_tuple(v0, v1, v2));
-		}
-	}
+	//	auto vd01 = v1 - v0;
+	//	auto vd02 = v2 - v0;
+	//	auto vnormal = vd01 ^ vd02;
+	//	vnormal.normalize();
+	//	if (normal * vnormal < 0)
+	//	{
+	//		result.push_back(make_tuple(v0, v2, v1));
+	//	}
+	//	else
+	//	{
+	//		result.push_back(make_tuple(v0, v1, v2));
+	//	}
+	//}
 }
 
 template<typename T>
