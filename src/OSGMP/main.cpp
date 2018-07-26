@@ -209,7 +209,7 @@ public:
 					//g_pMP->SaveSTLFile("Mx", "../../res/R1.stl", true);
 					//g_pMP->SaveSTLFile("MxTeeth", "../../res/R2.stl", true);
 
-					g_pMP->SaveSTLFile("TEMP", "../../res/TEMP.stl", true);
+					g_pMP->SaveSTLFile("Triangle", "../../res/Triangle.stl", true);
 				}
 				return false;
 			case 'a':
@@ -953,186 +953,49 @@ int main(int argc, char** argv)
 
 
 
-	//Vec3 fv0(0, -400, 0);
-	//Vec3 fv1(500, -400, 0);
-	//Vec3 fv2(250, 0, 0);
-	//pvd->AddTriangle(fv0, fv1, fv2, Vec4(GREEN, 0.3), true);
+	Vec3 fv0(0, -400, 0);
+	Vec3 fv1(500, -400, 0);
+	Vec3 fv2(250, 0, 0);
 
 	vector<Vec3> vertices;
-	//////////vertices.push_back(fv0);
-	//////////vertices.push_back(fv1);
-	//////////vertices.push_back(fv2);
-	////////vertices.push_back(Vec3(110, -260, 0));
-	////////vertices.push_back(Vec3(120, -330, 0));
-	////////vertices.push_back(Vec3(190, -120, 0));
-	////////vertices.push_back(Vec3(230, -180, 0));
-	////////vertices.push_back(Vec3(170, -230, 0));
-	////////vertices.push_back(Vec3(200, -250, 0));
-	////////vertices.push_back(Vec3(150, -310, 0));
-	////////vertices.push_back(Vec3(230, -300, 0));
-	////////vertices.push_back(Vec3(230, -210, 0));
-	////////vertices.push_back(Vec3(270, -190, 0));
-	////////vertices.push_back(Vec3(240, -130, 0));
-	////////vertices.push_back(Vec3(230, -70, 0));
-	////////vertices.push_back(Vec3(280, -100, 0));
-	////////vertices.push_back(Vec3(310, -210, 0));
-	////////vertices.push_back(Vec3(240, -250, 0));
-	////////vertices.push_back(Vec3(270, -270, 0));
-	////////vertices.push_back(Vec3(290, -230, 0));
-	////////vertices.push_back(Vec3(330, -240, 0));
-	////////vertices.push_back(Vec3(340, -270, 0));
-	////////vertices.push_back(Vec3(320, -320, 0));
-	////////vertices.push_back(Vec3(130, -360, 0));
-	////////vertices.push_back(Vec3(390, -380, 0));
-	////////vertices.push_back(Vec3(270, -350, 0));
-	////////vertices.push_back(Vec3(380, -330, 0));
-	////////vertices.push_back(Vec3(360, -220, 0));
-
-
-
-
-	vertices.push_back(Vec3(0.939718, 0.00149083, 0));
-	vertices.push_back(Vec3(0.459635, 0.328918, 0));
-	vertices.push_back(Vec3(0.545203, 0.521633, 0));
-	vertices.push_back(Vec3(0.142404, 0.982294, 0));
-	vertices.push_back(Vec3(0.733818, 0.0352899, 0));
-	vertices.push_back(Vec3(0.150613, 0.903548, 0));
-	vertices.push_back(Vec3(0.636916, 0.557598, 0));
-	vertices.push_back(Vec3(0.0998009, 0.48953, 0));
-	vertices.push_back(Vec3(0.424942, 0.925505, 0));
-	vertices.push_back(Vec3(0.441789, 0.623109, 0));
-	vertices.push_back(Vec3(0.40419, 0.765702, 0));
-	vertices.push_back(Vec3(0.472585, 0.453032, 0));
-	vertices.push_back(Vec3(0.464472, 0.764211, 0));
-	vertices.push_back(Vec3(0.0129508, 0.124114, 0));
-	vertices.push_back(Vec3(0.919269, 0.242578, 0));
-	vertices.push_back(Vec3(0.870547, 0.14182, 0));
-	vertices.push_back(Vec3(0.185451, 0.207288, 0));
-	vertices.push_back(Vec3(0.719935, 0.238272, 0));
-	vertices.push_back(Vec3(0.548535, 0.64969, 0));
-	vertices.push_back(Vec3(0.620134, 0.748742, 0));
-	vertices.push_back(Vec3(0.123593, 0.724185, 0));
-	vertices.push_back(Vec3(0.178345, 0.125632, 0));
-	vertices.push_back(Vec3(0.719403, 0.958484, 0));
-	vertices.push_back(Vec3(0.705759, 0.6726, 0));
-	vertices.push_back(Vec3(0.254932, 0.194273, 0));
-	vertices.push_back(Vec3(0.692809, 0.548486, 0));
-	vertices.push_back(Vec3(0.335663, 0.951695, 0));
-	vertices.push_back(Vec3(0.822261, 0.406666, 0));
-	vertices.push_back(Vec3(0.150212, 0.744407, 0));
-	vertices.push_back(Vec3(0.102327, 0.168394, 0));
-	vertices.push_back(Vec3(0.601678, 0.0947169, 0));
-	vertices.push_back(Vec3(0.482193, 0.419652, 0));
-	vertices.push_back(Vec3(0.478085, 0.370531, 0));
-	vertices.push_back(Vec3(0.303848, 0.29402, 0));
-	vertices.push_back(Vec3(0.758682, 0.412048, 0));
-	vertices.push_back(Vec3(0.598089, 0.62142, 0));
-	vertices.push_back(Vec3(0.50375, 0.217775, 0));
-	vertices.push_back(Vec3(0.90528, 0.0729336, 0));
-	vertices.push_back(Vec3(0.168087, 0.26608, 0));
-	vertices.push_back(Vec3(0.0830191, 0.666267, 0));
-	vertices.push_back(Vec3(0.0178743, 0.521673, 0));
-	vertices.push_back(Vec3(0.980692, 0.497873, 0));
-	vertices.push_back(Vec3(0.416196, 0.426957, 0));
-	vertices.push_back(Vec3(0.498499, 0.078221, 0));
-	vertices.push_back(Vec3(0.938112, 0.0564251, 0));
-	vertices.push_back(Vec3(0.194651, 0.784201, 0));
-	vertices.push_back(Vec3(0.17943, 0.644377, 0));
-	vertices.push_back(Vec3(0.596562, 0.162781, 0));
-	vertices.push_back(Vec3(0.67568, 0.426602, 0));
-	vertices.push_back(Vec3(0.691281, 0.0898479, 0));
-	vertices.push_back(Vec3(0.507594, 0.160522, 0));
-	vertices.push_back(Vec3(0.608262, 0.42358, 0));
-	vertices.push_back(Vec3(0.489719, 0.638848, 0));
-	vertices.push_back(Vec3(0.62757, 0.925707, 0));
-	vertices.push_back(Vec3(0.0735229, 0.211892, 0));
-	vertices.push_back(Vec3(0.129071, 0.847486, 0));
-	vertices.push_back(Vec3(0.135411, 0.155467, 0));
-	vertices.push_back(Vec3(0.93442, 0.0632851, 0));
-	vertices.push_back(Vec3(0.955981, 0.511089, 0));
-	vertices.push_back(Vec3(0.337858, 0.900504, 0));
-	vertices.push_back(Vec3(0.280301, 0.0844871, 0));
-	vertices.push_back(Vec3(0.646577, 0.810656, 0));
-	vertices.push_back(Vec3(0.772707, 0.923965, 0));
-	vertices.push_back(Vec3(0.0383153, 0.387075, 0));
-	vertices.push_back(Vec3(0.282988, 0.285117, 0));
-	vertices.push_back(Vec3(0.410746, 0.461368, 0));
-	vertices.push_back(Vec3(0.209465, 0.0732255, 0));
-	vertices.push_back(Vec3(0.281675, 0.613882, 0));
-	vertices.push_back(Vec3(0.0740536, 0.917759, 0));
-	vertices.push_back(Vec3(0.347255, 0.550597, 0));
-	vertices.push_back(Vec3(0.118073, 0.40667, 0));
-	vertices.push_back(Vec3(0.0093963, 0.650093, 0));
-	vertices.push_back(Vec3(0.837772, 0.322183, 0));
-	vertices.push_back(Vec3(0.362819, 0.839438, 0));
-	vertices.push_back(Vec3(0.065065, 0.398217, 0));
-	vertices.push_back(Vec3(0.324504, 0.452362, 0));
-	vertices.push_back(Vec3(0.782077, 0.1131, 0));
-	vertices.push_back(Vec3(0.913758, 0.990994, 0));
-	vertices.push_back(Vec3(0.572613, 0.0398746, 0));
-	vertices.push_back(Vec3(0.632083, 0.377112, 0));
-	vertices.push_back(Vec3(0.498559, 0.122116, 0));
-	vertices.push_back(Vec3(0.284828, 0.826515, 0));
-	vertices.push_back(Vec3(0.380486, 0.715446, 0));
-	vertices.push_back(Vec3(0.275432, 0.176422, 0));
-	vertices.push_back(Vec3(0.542714, 0.393263, 0));
-	vertices.push_back(Vec3(0.912613, 0.336984, 0));
-	vertices.push_back(Vec3(0.477649, 0.995046, 0));
-	vertices.push_back(Vec3(0.58811, 0.884622, 0));
-	vertices.push_back(Vec3(0.695572, 0.881946, 0));
-	vertices.push_back(Vec3(0.674352, 0.893628, 0));
-	vertices.push_back(Vec3(0.122959, 0.842071, 0));
-	vertices.push_back(Vec3(0.0422684, 0.516516, 0));
-	vertices.push_back(Vec3(0.6244, 0.719956, 0));
-	vertices.push_back(Vec3(0.75744, 0.690001, 0));
-	vertices.push_back(Vec3(0.243914, 0.00450979, 0));
-	vertices.push_back(Vec3(0.482008, 0.513579, 0));
-	vertices.push_back(Vec3(0.7012, 0.611247, 0));
-	vertices.push_back(Vec3(0.569394, 0.176595, 0));
-	vertices.push_back(Vec3(0.223551, 0.616201, 0));
-	vertices.push_back(Vec3(0.981285, 0.291973, 0));
-
-#pragma region Projection Test
-	//mp.LoadABDFile("Mx", "../../res/random plane.abd");
-	//auto pMesh = mp.GetMesh("Mx");
-
-	//set<Vertex<Vec3>*> vertices;
-	//pMesh->GetVertices(vertices);
-
-	//vector<Vec3> positions;
-	//for (auto& pV : vertices)
-	//{
-	//	g_pMP->ProjectToPlane(Vec3(0, 0, 10), Vec3(0, -1, -1), pV->P(), pV->P());
-	//}
-#pragma endregion
+	//vertices.push_back(fv0);
+	//vertices.push_back(fv1);
+	//vertices.push_back(fv2);
+	vertices.push_back(Vec3(110, -260, 0));
+	vertices.push_back(Vec3(120, -330, 0));
+	vertices.push_back(Vec3(190, -120, 0));
+	vertices.push_back(Vec3(230, -180, 0));
+	vertices.push_back(Vec3(170, -230, 0));
+	vertices.push_back(Vec3(200, -250, 0));
+	vertices.push_back(Vec3(150, -310, 0));
+	vertices.push_back(Vec3(230, -300, 0));
+	vertices.push_back(Vec3(230, -210, 0));
+	vertices.push_back(Vec3(270, -190, 0));
+	vertices.push_back(Vec3(240, -130, 0));
+	vertices.push_back(Vec3(230, -70, 0));
+	vertices.push_back(Vec3(280, -100, 0));
+	vertices.push_back(Vec3(310, -210, 0));
+	vertices.push_back(Vec3(240, -250, 0));
+	vertices.push_back(Vec3(270, -270, 0));
+	vertices.push_back(Vec3(290, -230, 0));
+	vertices.push_back(Vec3(330, -240, 0));
+	vertices.push_back(Vec3(340, -270, 0));
+	vertices.push_back(Vec3(320, -320, 0));
+	vertices.push_back(Vec3(130, -360, 0));
+	vertices.push_back(Vec3(390, -380, 0));
+	vertices.push_back(Vec3(270, -350, 0));
+	vertices.push_back(Vec3(380, -330, 0));
+	vertices.push_back(Vec3(360, -220, 0));
 
 	auto pMesh = g_pMP->GetOrCreateMesh("Triangle");
-
-	Vec3 fv0(-500, -500, 0);
-	Vec3 fv1(500, -500, 0);
-	Vec3 fv2(0, 500, 0);
 	pMesh->GetOrCreateFace(fv0, fv1, fv2);
 
 	for (auto& v : vertices)
 	{
-		pMesh->InsertVertex(v * 100);
+		pMesh->InsertVertex(v);
 	}
 
-	//pMesh->Refresh();
-
-	//for (auto& pF : pMesh->GetFaces())
-	//{
-	//	pvd->AddTriangle(pF->V0()->P() + Vec3(0, 0, 10), pF->V1()->P() + Vec3(0, 0, 10), pF->V2()->P() + Vec3(0, 0, 10), V4_BLUE, true);
-	//}
-
 	pMesh->RefineFaces();
-
-	auto pV0 = pMesh->GetVertex(fv0);
-	auto pV1 = pMesh->GetVertex(fv1);
-	auto pV2 = pMesh->GetVertex(fv2);
-	pV0->QueryDelete();
-	pV1->QueryDelete();
-	pV2->QueryDelete();
 
 	g_pMP->UpdateModel();
 
