@@ -68,10 +68,10 @@ public:
 
 	void Triangulate(const T& fv0, const T& fv1, const T& fv2, const vector<T>& points, vector<tuple<T, T, T>>& result);
 
-	void ProjectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const T& inputPoint, T& projectedPoint);
-	void ProjectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const vector<T>& inputPoints, vector<T>& projectedPoints);
-	void ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, const T& inputPoint, T& projectedPoint);
-	void ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, const vector<T>& inputPoints, vector<T>& projectedPoints);
+	//void ProjectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const T& inputPoint, T& projectedPoint);
+	//void ProjectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const vector<T>& inputPoints, vector<T>& projectedPoints);
+	//void ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, const T& inputPoint, T& projectedPoint);
+	//void ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, const vector<T>& inputPoints, vector<T>& projectedPoints);
 
 	inline void SetVD(PrimitiveRendererVEFM<T>* pVD) { m_pVD = pVD; }
 

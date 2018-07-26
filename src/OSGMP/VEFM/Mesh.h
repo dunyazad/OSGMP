@@ -59,7 +59,9 @@ namespace VEFM
 		void InsertVertex(const T& p);
 		void InsertVertex(Vertex<T>* pV);
 
-		void RefineFace(Face<T>* pF);
+		bool MakeDelaunayhood(Face<T>* pFA, Face<T>* pFB);
+
+		void RefineFaces();
 
 		//inline const map<T, Vertex<T>*>& GetVertices() const { return m_vertices; }
 		inline void GetVertices(set<Vertex<T>*>& vertices) const { m_pVolumeInfo->GetAllElements(vertices); }

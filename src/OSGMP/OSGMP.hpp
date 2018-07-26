@@ -1380,69 +1380,69 @@ void OSGMP<T>::Triangulate(const T& fv0, const T& fv1, const T& fv2, const vecto
 	//	}
 	//}
 }
-
-template<typename T>
-void OSGMP<T>::ProjectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const T& inputPoint, T& projectedPoint)
-{
-	IntersectRayPlane<T>(inputPoint, -projectionPlaneNormal, projectionPlanePosition, projectionPlaneNormal, projectedPoint);
-}
-
-template<typename T>
-void OSGMP<T>::ProjectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const vector<T>& inputPoints, vector<T>& projectedPoints)
-{
-	for (auto& ip : inputPoints)
-	{
-		T rp;
-		if (IntersectRayPlane<T>(ip, -projectionPlaneNormal, projectionPlanePosition, projectionPlaneNormal, rp))
-		{
-			projectedPoints.push_back(rp);
-		}
-		else
-		{
-			projectedPoints.push_back(ip);
-		}
-	}
-}
-
-template<typename T>
-void OSGMP<T>::ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, const T& inputPoint, T& projectedPoint)
-{
-	float x = projectionPlaneNormal.x();
-	float y = projectionPlaneNormal.y();
-	float z = projectionPlaneNormal.z();
-	if (x > y && x > z)
-	{
-		ProjectToPlane(projectionPlanePosition, T(1, 0, 0), inputPoint, projectedPoint);
-	}
-	else if (y > x && y > z)
-	{
-		ProjectToPlane(projectionPlanePosition, T(0, 1, 0), inputPoint, projectedPoint);
-	}
-	else if (z > x && z > y)
-	{
-		ProjectToPlane(projectionPlanePosition, T(0, 0, 1), inputPoint, projectedPoint);
-	}
-}
-
-template<typename T>
-void OSGMP<T>::ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, const vector<T>& inputPoints, vector<T>& projectedPoints)
-{
-	float x = projectionPlaneNormal.x();
-	float y = projectionPlaneNormal.y();
-	float z = projectionPlaneNormal.z();
-	if (x > y && x > z)
-	{
-		ProjectToPlane(projectionPlanePosition, T(1, 0, 0), inputPoints, projectedPoints);
-	}
-	else if (y > x && y > z)
-	{
-		ProjectToPlane(projectionPlanePosition, T(0, 1, 0), inputPoints, projectedPoints);
-	}
-	else if (z > x && z > y)
-	{
-		ProjectToPlane(projectionPlanePosition, T(0, 0, 1), inputPoints, projectedPoints);
-	}
-}
+//
+//template<typename T>
+//void OSGMP<T>::ProjectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const T& inputPoint, T& projectedPoint)
+//{
+//	IntersectRayPlane<T>(inputPoint, -projectionPlaneNormal, projectionPlanePosition, projectionPlaneNormal, projectedPoint);
+//}
+//
+//template<typename T>
+//void OSGMP<T>::ProjectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const vector<T>& inputPoints, vector<T>& projectedPoints)
+//{
+//	for (auto& ip : inputPoints)
+//	{
+//		T rp;
+//		if (IntersectRayPlane<T>(ip, -projectionPlaneNormal, projectionPlanePosition, projectionPlaneNormal, rp))
+//		{
+//			projectedPoints.push_back(rp);
+//		}
+//		else
+//		{
+//			projectedPoints.push_back(ip);
+//		}
+//	}
+//}
+//
+//template<typename T>
+//void OSGMP<T>::ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, const T& inputPoint, T& projectedPoint)
+//{
+//	float x = projectionPlaneNormal.x();
+//	float y = projectionPlaneNormal.y();
+//	float z = projectionPlaneNormal.z();
+//	if (x > y && x > z)
+//	{
+//		ProjectToPlane(projectionPlanePosition, T(1, 0, 0), inputPoint, projectedPoint);
+//	}
+//	else if (y > x && y > z)
+//	{
+//		ProjectToPlane(projectionPlanePosition, T(0, 1, 0), inputPoint, projectedPoint);
+//	}
+//	else if (z > x && z > y)
+//	{
+//		ProjectToPlane(projectionPlanePosition, T(0, 0, 1), inputPoint, projectedPoint);
+//	}
+//}
+//
+//template<typename T>
+//void OSGMP<T>::ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNormal, const vector<T>& inputPoints, vector<T>& projectedPoints)
+//{
+//	float x = projectionPlaneNormal.x();
+//	float y = projectionPlaneNormal.y();
+//	float z = projectionPlaneNormal.z();
+//	if (x > y && x > z)
+//	{
+//		ProjectToPlane(projectionPlanePosition, T(1, 0, 0), inputPoints, projectedPoints);
+//	}
+//	else if (y > x && y > z)
+//	{
+//		ProjectToPlane(projectionPlanePosition, T(0, 1, 0), inputPoints, projectedPoints);
+//	}
+//	else if (z > x && z > y)
+//	{
+//		ProjectToPlane(projectionPlanePosition, T(0, 0, 1), inputPoints, projectedPoints);
+//	}
+//}
 
 template<typename T>
 void MakeReverse(vector<pair<T, T>>& input)

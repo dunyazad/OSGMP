@@ -218,6 +218,7 @@ namespace VEFM
 			if (m_pLeftChild != nullptr)
 			{
 				m_pLeftChild->m_pParent = nullptr;
+				delete m_pLeftChild;
 			}
 			m_pLeftChild = pLeftChild;
 		}
@@ -240,30 +241,31 @@ namespace VEFM
 			if (m_pRightChild != nullptr)
 			{
 				m_pRightChild->m_pParent = nullptr;
+				delete m_pRightChild;
 			}
 			m_pRightChild = pRightChild;
 		}
 
 		void RemoveLeftChild()
 		{
-			auto pLeftChild = m_pLeftChild;
 			if (m_pLeftChild != nullptr)
 			{
-				m_pLeftChild->m_pParent = nullptr;
+				printf("Removing %s\n", m_pLeftChild->m_name.c_str());
+
+				delete m_pLeftChild;
+				m_pLeftChild = nullptr;
 			}
-			m_pLeftChild = nullptr;
-			delete pLeftChild;
 		}
 
 		void RemoveRightChild()
 		{
-			auto pRightChild = m_pRightChild;
 			if (m_pRightChild != nullptr)
 			{
-				m_pRightChild->m_pParent = nullptr;
+				printf("Removing %s\n", m_pRightChild->m_name.c_str());
+
+				delete pRightChild;
+				m_pRightChild = nullptr;
 			}
-			m_pRightChild = nullptr;
-			delete pRightChild;
 		}
 
 	protected:
@@ -280,8 +282,10 @@ namespace VEFM
 		{
 		}
 
-		~BinaryTreeNode()
+		virtual ~BinaryTreeNode()
 		{
+			printf("Deleting %s\n", m_name.c_str());
+
 			if (m_pLeftChild != nullptr)
 			{
 				delete m_pLeftChild;
@@ -293,6 +297,8 @@ namespace VEFM
 				delete m_pRightChild;
 				m_pRightChild = nullptr;
 			}
+
+			printf("OK %s\n", m_name.c_str());
 		}
 
 		public:

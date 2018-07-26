@@ -347,6 +347,11 @@ namespace VEFM
 	template <typename T>
 	Face<T>* Mesh<T>::GetOrCreateFace(const T& p0, const T& p1, const T& p2)
 	{
+		//if (p0 == p1 || p1 == p2 || p2 == p0)
+		//{
+		//	printf("Same Point in Triangle...!!!\n");
+		//}
+
 		auto pE0 = GetOrCreateEdge(p0, p1);
 		auto pE1 = GetOrCreateEdge(p1, p2);
 		auto pE2 = GetOrCreateEdge(p2, p0);
@@ -794,37 +799,112 @@ namespace VEFM
 	}
 
 	template <typename T>
-	void Mesh<T>::RefineFace(Face<T>* pF)
+	bool Mesh<T>::MakeDelaunayhood(Face<T>* pFA, Face<T>* pFB)
 	{
-		set<Vetex<T>*> points;
-		set<Face<T>*> incidentFaces;
-		for (auto& pIF : pF->E0()->GetInsidentFaces())
+		if (pFA->IsDeleteQueried() || pFB->IsDeleteQueried())
 		{
-			incidentFaces.insert(pIF);
-		}
-		for (auto& pIF : pF->E1()->GetInsidentFaces())
-		{
-			incidentFaces.insert(pIF);
-		}
-		for (auto& pIF : pF->E2()->GetInsidentFaces())
-		{
-			incidentFaces.insert(pIF);
+			return false;
 		}
 
-		for (auto& pIF : incidentFaces)
+		int count = 0;
+		count += pFA->GetEdge0()->GetInsidentFaces().count(pFB);
+		count += pFA->GetEdge1()->GetInsidentFaces().count(pFB);
+		count += pFA->GetEdge2()->GetInsidentFaces().count(pFB);
+
+		if (count == 0)
 		{
-			points.insert(pIF->V0());
-			points.insert(pIF->V1());
-			points.insert(pIF->V2());
+			return false;
 		}
 
-		for (auto& p : points)
+		Vertex<T>* pNV = nullptr;
+
+		auto pCE = pFA->GetCommonEdge(pFB);
+		if (pCE->GetVertices().count(pFB->V0()) == 0)
 		{
-			if (p == pF->V0() || p == pF->V1() || p == pF->V2())
-				continue;
-
-
+			pNV = pFB->V0();
 		}
+		else if (pCE->GetVertices().count(pFB->V1()) == 0)
+		{
+			pNV = pFB->V1();
+		}
+		else if (pCE->GetVertices().count(pFB->V2()) == 0)
+		{
+			pNV = pFB->V2();
+		}
+
+		if (InCircumcircle<T>(pFA->V0()->P(), pFA->V1()->P(), pFA->V2()->P(), pNV->P(), false))
+		{
+			FlipEdge(pFA, pFB);
+		}
+
+		return true;
+	}
+
+	template <typename T>
+	void Mesh<T>::RefineFaces()
+	{
+		stack<Face<T>*> toRefine;
+		set<Face<T>*> visited;
+
+		auto& faces = GetFaces();
+		if (faces.size() == 0) return;
+
+		toRefine.push(faces.front());
+
+		while (toRefine.empty() == false)
+		{
+			auto pF = toRefine.top();
+			visited.insert(pF);
+			toRefine.pop();
+
+			set<Face<T>*> incidentFaces;
+			for (auto& pIF : pF->E0()->GetInsidentFaces())
+			{
+				incidentFaces.insert(pIF);
+			}
+			for (auto& pIF : pF->E1()->GetInsidentFaces())
+			{
+				incidentFaces.insert(pIF);
+			}
+			for (auto& pIF : pF->E2()->GetInsidentFaces())
+			{
+				incidentFaces.insert(pIF);
+			}
+
+			for (auto& pIF : incidentFaces)
+			{
+				if (pIF->IsDeleteQueried())
+					continue;
+				if (pF == pIF)
+					continue;
+
+				MakeDelaunayhood(pF, pIF);
+			}
+
+			incidentFaces.clear();
+			for (auto& pIF : pF->E0()->GetInsidentFaces())
+			{
+				incidentFaces.insert(pIF);
+			}
+			for (auto& pIF : pF->E1()->GetInsidentFaces())
+			{
+				incidentFaces.insert(pIF);
+			}
+			for (auto& pIF : pF->E2()->GetInsidentFaces())
+			{
+				incidentFaces.insert(pIF);
+			}
+
+			for (auto& pIF : incidentFaces)
+			{
+				if (visited.count(pIF) == 0)
+				{
+					toRefine.push(pIF);
+				}
+			}
+		}
+
+		Refresh();
 	}
 
 	template <typename T>
