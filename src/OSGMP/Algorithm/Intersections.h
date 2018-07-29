@@ -3,6 +3,38 @@
 #include <vector>
 using namespace std;
 
+inline bool FloatEqual(float a, float b)
+{
+	float epsilon;
+	/* May as well do the easy check first. */
+	if (a == b)
+		return true;
+
+	if (a > b) {
+		epsilon = a * 0.000001f;
+	}
+	else {
+		epsilon = b * 0.000001f;
+	}
+
+	return fabs(a - b) < epsilon;
+}
+
+template<typename T>
+inline bool IsPointOnTriangle(const T& p, const T& v0, const T& v1, const T& v2)
+{
+	auto u = v1 - v0;
+	auto v = v2 - v0;
+	auto n = u ^ v;
+	auto w = p - v0;
+	auto gamma = ((u ^ w) * n) / (n * n);
+	auto beta = ((w ^ v) * n) / (n * n);
+	auto alpha = 1 - gamma - beta;
+	return ((0 <= alpha) && (alpha <= 1) &&
+		(0 <= beta) && (beta <= 1) &&
+		(0 <= gamma) && (gamma <= 1));
+}
+
 template<typename T>
 bool IntersectRayPlane(const T& rayOrigin, const T& rayDir, const T& planeOrigin, const T& planeNormal, T& intersection)
 {
@@ -17,6 +49,152 @@ bool IntersectRayPlane(const T& rayOrigin, const T& rayDir, const T& planeOrigin
 	return false;
 }
 
+template<typename T>
+bool IntersectRayRay(const T& ao, const T& ad, const T& bo, const T& bd, T& point)
+{
+	// find a = v x u
+	auto a = ad ^ bd;            // cross product
+
+	// if v and u are parallel, then no intersection, return NaN point
+	if (FloatEqual(a.x(), 0) && FloatEqual(a.y(), 0) && FloatEqual(a.z(), 0))
+		//return Vec3(NAN, NAN, NAN);
+		return false;
+
+	// find b = (Q1-P1) x u
+	auto b = (bo - ao) ^ bd;      // cross product
+
+	// find t = b/a = (Q1-P1) x u / (v x u)
+	float t = 0;
+	if (FloatEqual(a.x(), 0) == false)
+		t = b.x() / a.x();
+	else if (FloatEqual(a.y(), 0) == false)
+		t = b.y() / a.y();
+	else if (FloatEqual(a.z(), 0) == false)
+		t = b.z() / a.z();
+
+	// find intersection point
+	point = ao + (ad * t);       // substitute t to line1
+	return true;
+}
+
+template<typename T>
+bool PointOnLine(const T& p, const T& la, const T& lb, bool includeVertex)
+{
+	if (includeVertex)
+	{
+		if (p == la || p == lb)
+		{
+			return true;
+		}
+	}
+	else
+	{
+		if (p == la || p == lb)
+		{
+			return false;
+		}
+	}
+
+	auto d = lb - la;
+
+	auto t = (d * (p - la)) / (d * d);
+	if (includeVertex)
+	{
+		return t >= 0 && t <= 1.0f;
+	}
+	else
+	{
+		return t > 0 && t < 1.0f;
+	}
+}
+
+template <typename T>
+bool PointOnTriangle(const T& p, const T& a, const T& b, const T& c, bool bIncludeEdge)
+{
+	auto v0 = c - a;
+	auto v1 = b - a;
+	auto v2 = p - a;
+
+	auto dot00 = v0 * v0;
+	auto dot01 = v0 * v1;
+	auto dot02 = v0 * v2;
+	auto dot11 = v1 * v1;
+	auto dot12 = v1 * v2;
+
+	auto invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+	auto u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+	auto v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+	// Check if point is in triangle
+	if (bIncludeEdge)
+	{
+		return (u >= 0) && (v >= 0) && (u + v <= 1);
+	}
+	else
+	{
+		return (u > 0) && (v > 0) && (u + v < 1);
+	}
+}
+
+template<typename T>
+bool EnableToTriangle(const T& p0, const T& p1, const T& p2)
+{
+	auto d01 = p1 - p0;
+	auto d02 = p2 - p0;
+	return (d01 * d02) != 0;
+}
+
+template<typename T>
+bool IntersectLineLine(const T& lava, const T& lavb, const T& lbva, const T& lbvb, T& intersection, bool bIncludeVertex)
+{
+	auto rao = lava;
+	auto rad = lavb - lava;
+	rad.normalize();
+
+	auto rbo = lbva;
+	auto rbd = lbvb - lbva;
+	rbd.normalize();
+
+	if (lava == lbva || lavb == lbvb || lavb == lbva || lavb == lbvb)
+	{
+		if (bIncludeVertex)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	if (IntersectRayRay<T>(rao, rad, rbo, rbd, intersection))
+	{
+		if (intersection == lava || intersection == lavb || intersection == lbva || intersection == lbvb)
+		{
+			if (bIncludeVertex)
+			{
+				if (PointOnLine<T>(intersection, lava, lavb, bIncludeVertex) && PointOnLine<T>(intersection, lbva, lbvb, bIncludeVertex))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	if (PointOnLine<T>(intersection, lava, lavb, bIncludeVertex) && PointOnLine<T>(intersection, lbva, lbvb, bIncludeVertex))
+	{
+		return true;
+	}
+
+	return false;
+}
 
 template<typename T>
 void ProjectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const T& inputPoint, T& projectedPoint)

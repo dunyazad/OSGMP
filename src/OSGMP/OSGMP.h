@@ -25,9 +25,6 @@ using namespace VEFM;
 
 typedef unsigned int uint;
 
-inline bool IsPointOnTriangle(const Vec3& p, const Vec3& v0, const Vec3& v1, const Vec3& v2);
-inline bool FloatEqual(float a, float b);
-
 template<typename T>
 class OSGMP
 {

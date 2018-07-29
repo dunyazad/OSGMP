@@ -2,32 +2,32 @@
 
 namespace VEFM
 {
-	bool PointOnTriangle(const Vec3& p, const Vec3& a, const Vec3& b, const Vec3& c, bool bIncludeEdge)
-	{
-		auto v0 = c - a;
-		auto v1 = b - a;
-		auto v2 = p - a;
+	//bool PointOnTriangle(const Vec3& p, const Vec3& a, const Vec3& b, const Vec3& c, bool bIncludeEdge)
+	//{
+	//	auto v0 = c - a;
+	//	auto v1 = b - a;
+	//	auto v2 = p - a;
 
-		auto dot00 = v0 * v0;
-		auto dot01 = v0 * v1;
-		auto dot02 = v0 * v2;
-		auto dot11 = v1 * v1;
-		auto dot12 = v1 * v2;
+	//	auto dot00 = v0 * v0;
+	//	auto dot01 = v0 * v1;
+	//	auto dot02 = v0 * v2;
+	//	auto dot11 = v1 * v1;
+	//	auto dot12 = v1 * v2;
 
-		auto invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
-		auto u = (dot11 * dot02 - dot01 * dot12) * invDenom;
-		auto v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+	//	auto invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+	//	auto u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+	//	auto v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
-		// Check if point is in triangle
-		if (bIncludeEdge)
-		{
-			return (u >= 0) && (v >= 0) && (u + v <= 1);
-		}
-		else
-		{
-			return (u > 0) && (v > 0) && (u + v < 1);
-		}
-	}
+	//	// Check if point is in triangle
+	//	if (bIncludeEdge)
+	//	{
+	//		return (u >= 0) && (v >= 0) && (u + v <= 1);
+	//	}
+	//	else
+	//	{
+	//		return (u > 0) && (v > 0) && (u + v < 1);
+	//	}
+	//}
 
 	//void Triangluate(const Vec3& fv0, const Vec3& fv1, const Vec3& fv2, const vector<Vec3>& points, vector<tuple<Vec3, Vec3, Vec3>>& result)
 	//{

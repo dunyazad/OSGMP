@@ -1,36 +1,5 @@
 #pragma once
 
-inline bool IsPointOnTriangle(const Vec3& p, const Vec3& v0, const Vec3& v1, const Vec3& v2)
-{
-	auto u = v1 - v0;
-	auto v = v2 - v0;
-	auto n = u ^ v;
-	auto w = p - v0;
-	auto gamma = ((u ^ w) * n) / (n * n);
-	auto beta = ((w ^ v) * n) / (n * n);
-	auto alpha = 1 - gamma - beta;
-	return ((0 <= alpha) && (alpha <= 1) &&
-		(0 <= beta) && (beta <= 1) &&
-		(0 <= gamma) && (gamma <= 1));
-}
-
-inline bool FloatEqual(float a, float b)
-{
-	float epsilon;
-	/* May as well do the easy check first. */
-	if (a == b)
-		return true;
-
-	if (a > b) {
-		epsilon = a * 0.000001f;
-	}
-	else {
-		epsilon = b * 0.000001f;
-	}
-
-	return fabs(a - b) < epsilon;
-}
-
 template<typename T> OSGMP<T>::OSGMP(Group* pRootNode)
 {
 	m_pRootNode = new Group;
