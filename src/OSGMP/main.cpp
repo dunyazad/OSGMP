@@ -12,7 +12,7 @@ ref_ptr<Group> g_pRootNode;
 
 StopWatch g_stopWatch;
 
-map<tuple<Mesh<Vec3>*, Face<Vec3>*>, set<Vec3>> g_result;
+map<Mesh<Vec3>*, set<pair<Vec3, Vec3>>> g_result;
 int g_count = 0;
 
 set<Edge<Vec3>*> g_visitedEdges;
@@ -34,76 +34,20 @@ public:
 			case 'q':
 			{
 				printf("Q\n");
-
-				pvd->Clear();
-
-				auto pMesh = g_pMP->GetOrCreateMesh("TEMP");
-
-				pMesh->GetOrCreateFace(Vec3(0, 0, 0), Vec3(10, 0, 0), Vec3(5, 0, 5));
-				pMesh->GetOrCreateFace(Vec3(10, 0, 0), Vec3(15, 0, 5), Vec3(5, 0, 5));
-				pMesh->GetOrCreateFace(Vec3(10, 0, 0), Vec3(20, 0, 0), Vec3(15, 0, 5));
-				pMesh->GetOrCreateFace(Vec3(20, 0, 0), Vec3(25, 0, 5), Vec3(15, 0, 5));
-				pMesh->GetOrCreateFace(Vec3(20, 0, 0), Vec3(30, 0, 0), Vec3(25, 0, 5));
-
-				pMesh->GetOrCreateFace(Vec3(0, 0, 0), Vec3(5, 0, -5), Vec3(10, 0, 0));
-				pMesh->GetOrCreateFace(Vec3(10, 0, 0), Vec3(5, 0, -5), Vec3(15, 0, -5));
-				pMesh->GetOrCreateFace(Vec3(10, 0, 0), Vec3(15, 0, -5), Vec3(20, 0, 0));
-				pMesh->GetOrCreateFace(Vec3(20, 0, 0), Vec3(15, 0, -5), Vec3(25, 0, -5));
-				pMesh->GetOrCreateFace(Vec3(20, 0, 0), Vec3(25, 0, -5), Vec3(30, 0, 0));
-
-				g_pMP->UpdateModel();
-
-				pMesh->PrintInformation();
-
 				return true;
 			}
 			case 'r':
 			{
 				printf("R\n");
-				auto pMesh = g_pMP->GetMesh("Triangle");
-				pMesh->RefineFaces();
-
-				g_pMP->UpdateModel();
-
 				return false;
 			}
 			case 'w':
 			{
 				printf("W\n");
-
-				pvd->Clear();
-
-				auto pMesh = g_pMP->GetOrCreateMesh("TEMP");
-
-				auto pF0 = pMesh->GetFaces()[0];
-				auto pF1 = pMesh->GetFaces()[1];
-
-				pMesh->FlipEdge(pF0, pF1);
-
-				g_pMP->UpdateModel();
-
-				pMesh->PrintInformation();
-
 				return true;
 			}
 			case 'l':
 				printf("L\n");
-				{
-					auto pMesh = g_pMP->GetMesh("TEMP");
-					auto pE = pMesh->GetEdge(Vec3(10, 0, 0), Vec3(20, 0, 0));
-
-					pMesh->PrintInformation();
-
-					//pMesh->CollapseEdge(pE);
-					//pMesh->SplitEdge(pE);
-
-					auto pF = pMesh->GetFace(Vec3(0, 0, 0), Vec3(10, 0, 0), Vec3(5, 0, 5));
-					pMesh->SplitFace(pF, Vec3(5, 0, 2.5));
-
-					g_pMP->UpdateModel();
-
-					pMesh->PrintInformation();
-				}
 				return true;
 			case 'f':
 				printf("F\n");
@@ -160,9 +104,6 @@ public:
 					
 					g_pMP->CheckIntersection("Mx", "MxTeeth", g_result);
 					
-					auto seconds = g_stopWatch.Stop().first;
-					printf("seconds %f\n", seconds);
-
 					//for (auto& kvp : result)
 					//{
 					//	for (auto& vv : kvp.second)
@@ -172,6 +113,12 @@ public:
 					//}
 
 					g_pMP->SplitFaces(g_result);
+
+					auto seconds = g_stopWatch.Stop().first;
+					printf("seconds %f\n", seconds);
+
+					//g_pMP->GetMesh("Mx")->RefineFaces();
+					//g_pMP->GetMesh("MxTeeth")->RefineFaces();
 
 					g_pMP->UpdateModel();
 				}
@@ -947,66 +894,68 @@ int main(int argc, char** argv)
 	
 	
 #pragma region Model Intersection
-	//mp.LoadABDFile("Mx", "../../res/MxBone.abd");
-	//mp.LoadABDFile("MxTeeth", "../../res/MxTeeth.abd");
+	mp.LoadABDFile("Mx", "../../res/Cone.abd");
+	mp.LoadABDFile("MxTeeth", "../../res/Plane.abd");
 #pragma endregion
 
 
 
-	Vec3 fv0(0, -400, 0);
-	Vec3 fv1(500, -400, 0);
-	Vec3 fv2(250, 0, 0);
+#pragma region Delaunay Triangulation
+	//Vec3 fv0(0, -400, 0);
+	//Vec3 fv1(500, -400, 0);
+	//Vec3 fv2(250, 0, 0);
 
-	vector<Vec3> vertices;
-	//vertices.push_back(fv0);
-	//vertices.push_back(fv1);
-	//vertices.push_back(fv2);
-	vertices.push_back(Vec3(110, -260, 0));
-	vertices.push_back(Vec3(120, -330, 0));
-	vertices.push_back(Vec3(190, -120, 0));
-	vertices.push_back(Vec3(230, -180, 0));
-	vertices.push_back(Vec3(170, -230, 0));
-	vertices.push_back(Vec3(200, -250, 0));
-	vertices.push_back(Vec3(150, -310, 0));
-	vertices.push_back(Vec3(230, -300, 0));
-	vertices.push_back(Vec3(230, -210, 0));
-	vertices.push_back(Vec3(270, -190, 0));
-	vertices.push_back(Vec3(240, -130, 0));
-	vertices.push_back(Vec3(230, -70, 0));
-	vertices.push_back(Vec3(280, -100, 0));
-	vertices.push_back(Vec3(310, -210, 0));
-	vertices.push_back(Vec3(240, -250, 0));
-	vertices.push_back(Vec3(270, -270, 0));
-	vertices.push_back(Vec3(290, -230, 0));
-	vertices.push_back(Vec3(330, -240, 0));
-	vertices.push_back(Vec3(340, -270, 0));
-	vertices.push_back(Vec3(320, -320, 0));
-	vertices.push_back(Vec3(130, -360, 0));
-	vertices.push_back(Vec3(390, -380, 0));
-	vertices.push_back(Vec3(270, -350, 0));
-	vertices.push_back(Vec3(380, -330, 0));
-	vertices.push_back(Vec3(360, -220, 0));
+	//vector<Vec3> vertices;
+	////vertices.push_back(fv0);
+	////vertices.push_back(fv1);
+	////vertices.push_back(fv2);
+	//vertices.push_back(Vec3(110, -260, 0));
+	//vertices.push_back(Vec3(120, -330, 0));
+	//vertices.push_back(Vec3(190, -120, 0));
+	//vertices.push_back(Vec3(230, -180, 0));
+	//vertices.push_back(Vec3(170, -230, 0));
+	//vertices.push_back(Vec3(200, -250, 0));
+	//vertices.push_back(Vec3(150, -310, 0));
+	//vertices.push_back(Vec3(230, -300, 0));
+	//vertices.push_back(Vec3(230, -210, 0));
+	//vertices.push_back(Vec3(270, -190, 0));
+	//vertices.push_back(Vec3(240, -130, 0));
+	//vertices.push_back(Vec3(230, -70, 0));
+	//vertices.push_back(Vec3(280, -100, 0));
+	//vertices.push_back(Vec3(310, -210, 0));
+	//vertices.push_back(Vec3(240, -250, 0));
+	//vertices.push_back(Vec3(270, -270, 0));
+	//vertices.push_back(Vec3(290, -230, 0));
+	//vertices.push_back(Vec3(330, -240, 0));
+	//vertices.push_back(Vec3(340, -270, 0));
+	//vertices.push_back(Vec3(320, -320, 0));
+	//vertices.push_back(Vec3(130, -360, 0));
+	//vertices.push_back(Vec3(390, -380, 0));
+	//vertices.push_back(Vec3(270, -350, 0));
+	//vertices.push_back(Vec3(380, -330, 0));
+	//vertices.push_back(Vec3(360, -220, 0));
 
-	auto pMesh = g_pMP->GetOrCreateMesh("Triangle");
-	pMesh->GetOrCreateFace(fv0, fv1, fv2);
+	//auto pMesh = g_pMP->GetOrCreateMesh("Triangle");
+	//pMesh->GetOrCreateFace(fv0, fv1, fv2);
 
-	for (auto& v : vertices)
-	{
-		pMesh->InsertVertex(v);
-	}
+	//for (auto& v : vertices)
+	//{
+	//	pMesh->InsertVertex(v);
+	//}
 
-	pMesh->RefineFaces();
+	//pMesh->RefineFaces();
 
-	g_pMP->UpdateModel();
+	//g_pMP->UpdateModel();
 
-	for (int i = 1; i < vertices.size(); i++)
-	{
-		auto pE = pMesh->GetEdge(vertices[i - 1], vertices[i]);
-		if (pE == nullptr)
-		{
-			pvd->AddLine(vertices[i - 1], vertices[i], V4_RED, V4_RED);
-		}
-	}
+	//for (int i = 1; i < vertices.size(); i++)
+	//{
+	//	auto pE = pMesh->GetEdge(vertices[i - 1], vertices[i]);
+	//	if (pE == nullptr)
+	//	{
+	//		pvd->AddLine(vertices[i - 1], vertices[i], V4_RED, V4_RED);
+	//	}
+	//}
+#pragma endregion
 
 	return viewer.run();
 }

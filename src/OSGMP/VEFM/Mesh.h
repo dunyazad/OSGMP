@@ -32,6 +32,7 @@ namespace VEFM
 		Face<T>* GetFace(const T& p0, const T& p1, const T& p2);
 		Face<T>* GetFace(float x0, float y0, float z0, float x1, float y1, float z1, float x2, float y2, float z2);
 
+		Face<T>* GetOrCreateFace(Vertex<T>* pV0, Vertex<T>* pV1, Vertex<T>* pV2);
 		Face<T>* GetOrCreateFace(Edge<T>* pE0, Edge<T>* pE1, Edge<T>* pE2);
 		Face<T>* GetOrCreateFace(const T& p0, const T& p1, const T& p2);
 		Face<T>* GetOrCreateFace(float x0, float y0, float z0, float x1, float y1, float z1, float x2, float y2, float z2);

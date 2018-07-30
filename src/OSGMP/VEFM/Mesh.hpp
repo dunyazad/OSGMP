@@ -297,6 +297,16 @@ namespace VEFM
 	}
 
 	template <typename T>
+	Face<T>* Mesh<T>::GetOrCreateFace(Vertex<T>* pV0, Vertex<T>* pV1, Vertex<T>* pV2)
+	{
+		auto pE0 = GetOrCreateEdge(pV0, pV1);
+		auto pE1 = GetOrCreateEdge(pV1, pV2);
+		auto pE2 = GetOrCreateEdge(pV2, pV0);
+
+		return GetOrCreateFace(pE0, pE1, pE2);
+	}
+
+	template <typename T>
 	Face<T>* Mesh<T>::GetOrCreateFace(Edge<T>* pE0, Edge<T>* pE1, Edge<T>* pE2)
 	{
 		auto pFace = GetFace(pE0, pE1, pE2);
@@ -703,10 +713,12 @@ namespace VEFM
 
 		if (PointOnTriangle<T>(position, pF->V0()->P(), pF->V1()->P(), pF->V2()->P(), true))
 		{
+			auto pVertex = GetOrCreateVertex(position);
+
 			if (EnableToTriangle(pF->V0()->P(), pF->V1()->P(), position))
 			{
 				pF->QueryDelete();
-				GetOrCreateFace(pF->V0()->P(), pF->V1()->P(), position);
+				GetOrCreateFace(pF->V0(), pF->V1(), pVertex);
 			}
 			else
 			{
@@ -716,7 +728,7 @@ namespace VEFM
 			if (EnableToTriangle(pF->V1()->P(), pF->V2()->P(), position))
 			{
 				pF->QueryDelete();
-				GetOrCreateFace(pF->V1()->P(), pF->V2()->P(), position);
+				GetOrCreateFace(pF->V1(), pF->V2(), pVertex);
 			}
 			else
 			{
@@ -726,7 +738,7 @@ namespace VEFM
 			if (EnableToTriangle(pF->V2()->P(), pF->V0()->P(), position))
 			{
 				pF->QueryDelete();
-				GetOrCreateFace(pF->V2()->P(), pF->V0()->P(), position);
+				GetOrCreateFace(pF->V2(), pF->V0(), pVertex);
 			}
 			else
 			{

@@ -260,6 +260,18 @@ void ProjectToAxis(const T& projectionPlanePosition, const T& projectionPlaneNor
 }
 
 template<typename T>
+void UnprojectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const T& inputPoint, T& unprojectedPoint)
+{
+	ProjectToPlane(projectionPlanePosition, projectionPlaneNormal, inputPoint, unprojectedPoint);
+}
+
+template<typename T>
+void UnprojectToPlane(const T& projectionPlanePosition, const T& projectionPlaneNormal, const vector<T>& inputPoints, vector<T>& unprojectedPoints)
+{
+	ProjectToPlane(projectionPlanePosition, projectionPlaneNormal, inputPoints, unprojectedPoints);
+}
+
+template<typename T>
 bool Circumcircle(const T& p0, const T& p1, const T& p2, T& center, float& radius)
 {
 	float dA = p0.x() * p0.x() + p0.y() * p0.y();
